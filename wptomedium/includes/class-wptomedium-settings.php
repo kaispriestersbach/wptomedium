@@ -211,7 +211,7 @@ class WPtoMedium_Settings {
 
 		try {
 			$client  = new \Anthropic\Client( apiKey: $api_key );
-			$message = $client->messages->create(
+			$client->messages->create(
 				model: 'claude-haiku-4-5-20251001',
 				maxTokens: 1,
 				messages: array(
