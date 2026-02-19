@@ -94,6 +94,10 @@ class WPtoMedium_Settings {
 			class="regular-text"
 			autocomplete="off"
 		/>
+		<button type="button" class="button wptomedium-validate-key">
+			<?php esc_html_e( 'Validate Key', 'wptomedium' ); ?>
+		</button>
+		<span class="wptomedium-validate-result" style="display:none; margin-left:10px;"></span>
 		<?php if ( ! empty( $masked ) ) : ?>
 			<p class="description">
 				<?php
@@ -223,7 +227,7 @@ class WPtoMedium_Settings {
 		} catch ( \Anthropic\Core\Exceptions\RateLimitException $e ) {
 			wp_send_json_error( __( 'Rate limit exceeded. Key may be valid — try again later.', 'wptomedium' ) );
 		} catch ( \Exception $e ) {
-			wp_send_json_error( __( 'Connection error: ', 'wptomedium' ) . $e->getMessage() );
+			wp_send_json_error( sprintf( __( 'Connection error: %s', 'wptomedium' ), $e->getMessage() ) );
 		}
 	}
 }
