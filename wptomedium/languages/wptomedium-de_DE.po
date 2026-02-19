@@ -237,3 +237,32 @@ msgstr "HTML kopiert!"
 #: wptomedium.php
 msgid "Markdown copied!"
 msgstr "Markdown kopiert!"
+
+#: wptomedium.php
+msgid "Validating..."
+msgstr "Wird geprüft …"
+
+#: wptomedium.php
+#: includes/class-wptomedium-settings.php
+msgid "Validate Key"
+msgstr "API-Key prüfen"
+
+#: includes/class-wptomedium-settings.php
+msgid "Unauthorized."
+msgstr "Nicht autorisiert."
+
+#: includes/class-wptomedium-settings.php
+msgid "Please enter an API key."
+msgstr "Bitte einen API-Key eingeben."
+
+#: includes/class-wptomedium-settings.php
+msgid "API key is valid!"
+msgstr "API-Key ist gültig!"
+
+#: includes/class-wptomedium-settings.php
+msgid "Rate limit exceeded. Key may be valid — try again later."
+msgstr "Rate-Limit erreicht. Key möglicherweise gültig — bitte später erneut versuchen."
+
+#: includes/class-wptomedium-settings.php
+msgid "Connection error: %s"
+msgstr "Verbindungsfehler: %s"

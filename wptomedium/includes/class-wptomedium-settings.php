@@ -227,7 +227,11 @@ class WPtoMedium_Settings {
 		} catch ( \Anthropic\Core\Exceptions\RateLimitException $e ) {
 			wp_send_json_error( __( 'Rate limit exceeded. Key may be valid — try again later.', 'wptomedium' ) );
 		} catch ( \Exception $e ) {
-			wp_send_json_error( sprintf( __( 'Connection error: %s', 'wptomedium' ), $e->getMessage() ) );
+			wp_send_json_error( sprintf(
+				/* translators: %s: error message from the API connection attempt */
+				__( 'Connection error: %s', 'wptomedium' ),
+				$e->getMessage()
+			) );
 		}
 	}
 }
