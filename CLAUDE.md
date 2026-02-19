@@ -1,18 +1,18 @@
 # WPtoMedium
 
-WordPress-Plugin: Deutsche Blogartikel via AI (WP AI Client SDK) ins Englische übersetzen, Side-by-Side reviewen/bearbeiten, als HTML oder Markdown in die Zwischenablage kopieren. Human-in-the-Loop — nichts wird ohne Freigabe kopiert.
+WordPress-Plugin: Deutsche Blogartikel via AI (Anthropic PHP SDK) ins Englische übersetzen, Side-by-Side reviewen/bearbeiten, als HTML oder Markdown in die Zwischenablage kopieren. Human-in-the-Loop — nichts wird ohne Freigabe kopiert.
 
 ## Schlüsselentscheidungen
 
 - **Keine Medium API** — Medium vergibt seit 01/2025 keine Integration Tokens mehr. Output ist Copy-to-Clipboard.
-- **WP AI Client SDK** — provider-agnostisch (Claude, GPT, Gemini). Feature-Detection via `is_supported_for_text_generation()`.
+- **Anthropic PHP SDK** — direkte Integration der Anthropic API (Claude). Gebündelt in vendor/.
 - **Vendor-Bundling** — `vendor/` wird im Release-ZIP mitgeliefert. User braucht kein Composer. Autoloader mit `class_exists()`-Guard für WP 7.0-Kompatibilität.
 
 ## Build
 
 ```bash
 cd wptomedium/
-composer require wordpress/wp-ai-client wordpress/anthropic-ai-provider
+composer require anthropic-ai/sdk
 ```
 
 `vendor/` ins Release-ZIP einschließen. Kein Build-Step für JS/CSS.
@@ -35,6 +35,20 @@ docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-mo /app/lang
 - JS-Strings werden via `wp_localize_script` in `wptomedium.php` übergeben — neue JS-Strings dort als `__( '...', 'wptomedium' )` eintragen und in `admin/js/wptomedium-admin.js` über `wptomediumData.*` verwenden.
 - Locale: `de_DE` (WordPress Standard-Deutsch).
 - Alle drei Dateien (`.pot`, `.po`, `.mo`) committen.
+
+## Versionierung & Release
+
+Bei jedem Commit Version in diesen Dateien synchron hochzählen:
+- `wptomedium/wptomedium.php` — Header `Version:` UND `WPTOMEDIUM_VERSION`
+- `wptomedium/readme.txt` — `Stable tag:` + Changelog-Eintrag
+
+Release-ZIP erstellen:
+
+```bash
+bash build.sh
+```
+
+Erzeugt `wptomedium-X.Y.Z.zip` mit dem `wptomedium/`-Ordner (ohne `.git`, `docs/`, Build-Artefakte).
 
 ## Dateistruktur
 
@@ -61,7 +75,7 @@ wptomedium/
 ```
 Post auswählen → "Übersetzen" (AJAX)
   → Gutenberg→Medium-HTML Pipeline (prepare_content)
-  → AI-Übersetzung (WP AI Client SDK)
+  → AI-Übersetzung (Anthropic PHP SDK)
   → sanitize_for_medium (wp_kses)
   → Post Meta speichern
   → Review-Seite: Side-by-Side (Original read-only | Übersetzung editierbar via wp_editor)
@@ -149,7 +163,7 @@ Nicht unterstützt: `h3`-`h6`, `table`, `div`, `span`, CSS-Klassen, `iframe`
 
 ## Voraussetzungen
 
-- WordPress 6.x+, PHP 7.4+
+- WordPress 6.x+, PHP 8.1+
 - Keine separaten Plugins nötig (Dependencies gebündelt)
 
 ## Implementierungsreihenfolge

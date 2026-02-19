@@ -6,7 +6,7 @@ WordPress-Plugin: Deutsche Blogartikel per KI ins Englische übersetzen, Side-by
 
 ## Features
 
-- **KI-Übersetzung** — Provider-agnostisch via [WP AI Client SDK](https://developer.wordpress.org/ai/) (Claude, GPT, Gemini)
+- **KI-Übersetzung** — Via Anthropic API (Claude)
 - **Side-by-Side Review** — Original (read-only) neben editierbarer Übersetzung
 - **Medium-optimiert** — TinyMCE-Editor beschränkt auf Medium-kompatible Tags
 - **Copy-to-Clipboard** — HTML oder Markdown, bereit zum Einfügen in Medium
@@ -21,7 +21,7 @@ Medium vergibt seit Januar 2025 keine Integration Tokens mehr. Der Output ist de
 1. [Release-ZIP herunterladen](https://github.com/kaispriestersbach/wptomedium/releases) oder Repo klonen
 2. `wptomedium/`-Ordner nach `/wp-content/plugins/` hochladen
 3. Plugin im WordPress-Admin aktivieren
-4. KI-Zugangsdaten unter **Einstellungen > AI Credentials** konfigurieren
+4. Unter **WPtoMedium > Settings** den Anthropic API Key eingeben
 5. Unter **WPtoMedium > Artikel** loslegen
 
 ## Workflow
@@ -37,8 +37,8 @@ Artikel auswählen → "Übersetzen" klicken
 ## Voraussetzungen
 
 - WordPress 6.0+
-- PHP 7.4+
-- KI-API-Zugang (Claude, GPT oder Gemini) konfiguriert im WP AI Client SDK
+- PHP 8.1+
+- Anthropic API Key ([console.anthropic.com](https://console.anthropic.com/settings/keys))
 
 Alle Dependencies sind im Plugin gebündelt — kein Composer oder Build-Step nötig.
 
@@ -46,7 +46,7 @@ Alle Dependencies sind im Plugin gebündelt — kein Composer oder Build-Step n�
 
 ```bash
 cd wptomedium/
-composer require wordpress/wp-ai-client wordpress/anthropic-ai-provider
+composer require anthropic-ai/sdk
 ```
 
 Nach Änderungen an übersetzten Strings die i18n-Dateien aktualisieren:

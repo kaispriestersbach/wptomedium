@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION=$(grep -oP "Version:\s*\K[\d.]+" wptomedium/wptomedium.php)
+ZIPNAME="wptomedium-${VERSION}.zip"
+
+echo "Building ${ZIPNAME}..."
+
+# i18n aktualisieren
+docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-pot \
+  /app /app/languages/wptomedium.pot --domain=wptomedium --package-name="WPtoMedium"
+docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-mo /app/languages/
+
+# ZIP erstellen (nur wptomedium/ Ordner, ohne Dev-Dateien)
+zip -r "$ZIPNAME" wptomedium/ \
+  -x "wptomedium/composer.json" \
+  -x "wptomedium/composer.lock"
+
+echo "Created ${ZIPNAME} ($(du -h "$ZIPNAME" | cut -f1))"
