@@ -94,6 +94,8 @@ function wptomedium_enqueue_admin_assets( $hook_suffix ) {
 		'requestFailed'    => __( 'Translation request failed.', 'wptomedium' ),
 		'htmlCopied'       => __( 'HTML copied!', 'wptomedium' ),
 		'markdownCopied'   => __( 'Markdown copied!', 'wptomedium' ),
+		'validating'       => __( 'Validating...', 'wptomedium' ),
+		'validateKey'      => __( 'Validate Key', 'wptomedium' ),
 	) );
 }
 

@@ -128,4 +128,33 @@
 		} );
 	} );
 
+	// Validate API Key.
+	$( document ).on( 'click', '.wptomedium-validate-key', function() {
+		var $btn    = $( this );
+		var $result = $( '.wptomedium-validate-result' );
+		var apiKey  = $( 'input[name="wptomedium_api_key"]' ).val();
+
+		$btn.prop( 'disabled', true ).text( wptomediumData.validating );
+		$result.hide();
+
+		$.post( wptomediumData.ajaxUrl, {
+			action:  'wptomedium_validate_key',
+			nonce:   wptomediumData.nonce,
+			api_key: apiKey,
+		} )
+		.done( function( response ) {
+			if ( response.success ) {
+				$result.text( response.data ).css( 'color', '#00a32a' ).fadeIn();
+			} else {
+				$result.text( response.data ).css( 'color', '#d63638' ).fadeIn();
+			}
+		} )
+		.fail( function() {
+			$result.text( wptomediumData.requestFailed ).css( 'color', '#d63638' ).fadeIn();
+		} )
+		.always( function() {
+			$btn.prop( 'disabled', false ).text( wptomediumData.validateKey );
+		} );
+	} );
+
 } )( jQuery );
