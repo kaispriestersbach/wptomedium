@@ -107,3 +107,4 @@ add_filter( 'plugin_action_links_' . WPTOMEDIUM_PLUGIN_BASENAME, function( $link
 
 // AJAX-Handler registrieren.
 WPtoMedium_Workflow::register_ajax_handlers();
+add_action( 'wp_ajax_wptomedium_validate_key', array( 'WPtoMedium_Settings', 'ajax_validate_key' ) );

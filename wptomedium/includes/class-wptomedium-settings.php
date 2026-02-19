@@ -185,4 +185,45 @@ class WPtoMedium_Settings {
 	public static function get_model() {
 		return get_option( self::OPTION_MODEL, 'claude-sonnet-4-20250514' );
 	}
+
+	/**
+	 * AJAX handler to validate the Anthropic API key.
+	 */
+	public static function ajax_validate_key() {
+		check_ajax_referer( 'wptomedium_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( __( 'Unauthorized.', 'wptomedium' ) );
+		}
+
+		$api_key = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '';
+		if ( empty( $api_key ) ) {
+			wp_send_json_error( __( 'Please enter an API key.', 'wptomedium' ) );
+		}
+
+		if ( ! class_exists( 'Anthropic\\Client' ) ) {
+			wp_send_json_error( __( 'Anthropic SDK not available.', 'wptomedium' ) );
+		}
+
+		try {
+			$client  = new \Anthropic\Client( apiKey: $api_key );
+			$message = $client->messages->create(
+				model: 'claude-haiku-4-5-20251001',
+				maxTokens: 1,
+				messages: array(
+					array(
+						'role'    => 'user',
+						'content' => 'Hi',
+					),
+				),
+			);
+			wp_send_json_success( __( 'API key is valid!', 'wptomedium' ) );
+		} catch ( \Anthropic\Core\Exceptions\AuthenticationException $e ) {
+			wp_send_json_error( __( 'Invalid API key.', 'wptomedium' ) );
+		} catch ( \Anthropic\Core\Exceptions\RateLimitException $e ) {
+			wp_send_json_error( __( 'Rate limit exceeded. Key may be valid — try again later.', 'wptomedium' ) );
+		} catch ( \Exception $e ) {
+			wp_send_json_error( __( 'Connection error: ', 'wptomedium' ) . $e->getMessage() );
+		}
+	}
 }
