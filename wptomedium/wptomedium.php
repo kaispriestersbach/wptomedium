@@ -8,7 +8,7 @@
  * Text Domain: wptomedium
  * Domain Path: /languages
  * Requires at least: 6.0
- * Requires PHP: 7.4
+ * Requires PHP: 8.1
  * License:     GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  */
@@ -32,8 +32,8 @@ function wptomedium_load_textdomain() {
 	load_plugin_textdomain( 'wptomedium', false, dirname( WPTOMEDIUM_PLUGIN_BASENAME ) . '/languages' );
 }
 
-// Vendor Autoloader (WP AI Client SDK) — mit Guard für WP 7.0-Kompatibilität.
-if ( ! class_exists( 'WordPress\\AI_Client\\AI_Client' ) ) {
+// Vendor Autoloader (Anthropic SDK) — mit Guard für WP 7.0-Kompatibilität.
+if ( ! class_exists( 'Anthropic\\Client' ) ) {
 	$autoloader = WPTOMEDIUM_PLUGIN_DIR . 'vendor/autoload.php';
 	if ( file_exists( $autoloader ) ) {
 		require_once $autoloader;
@@ -47,13 +47,6 @@ require_once WPTOMEDIUM_PLUGIN_DIR . 'includes/class-wptomedium-workflow.php';
 
 // Settings registrieren.
 add_action( 'admin_init', array( 'WPtoMedium_Settings', 'register_settings' ) );
-
-// AI Client initialisieren.
-add_action( 'init', function() {
-	if ( class_exists( 'WordPress\\AI_Client\\AI_Client' ) ) {
-		WordPress\AI_Client\AI_Client::init();
-	}
-} );
 
 // Admin-Menü.
 add_action( 'admin_menu', array( 'WPtoMedium_Workflow', 'register_menu' ) );

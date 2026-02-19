@@ -11,8 +11,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-19T11:17:05+00:00\n"
-"PO-Revision-Date: 2026-02-19 12:00+0100\n"
+"POT-Creation-Date: 2026-02-19T12:00:00+00:00\n"
+"PO-Revision-Date: 2026-02-19 13:00+0100\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wptomedium\n"
@@ -39,181 +39,201 @@ msgstr "Deutsche WordPress-Beiträge per KI ins Englische übersetzen und für M
 msgid "Kai"
 msgstr "Kai"
 
-#: includes/class-wptomedium-settings.php:34
+#: includes/class-wptomedium-settings.php
 msgid "AI Configuration"
 msgstr "KI-Konfiguration"
 
-#: includes/class-wptomedium-settings.php:41
-msgid "Preferred AI Model"
-msgstr "Bevorzugtes KI-Modell"
+#: includes/class-wptomedium-settings.php
+msgid "Anthropic API Key"
+msgstr "Anthropic API-Schlüssel"
 
-#: includes/class-wptomedium-settings.php:55
-msgid "Configure your AI API key under"
-msgstr "Konfiguriere deinen KI-API-Schlüssel unter"
+#: includes/class-wptomedium-settings.php
+msgid "Claude Model"
+msgstr "Claude-Modell"
 
-#: includes/class-wptomedium-settings.php:57
-msgid "Settings > AI Credentials"
-msgstr "Einstellungen > KI-Zugangsdaten"
+#: includes/class-wptomedium-settings.php
+msgid "Enter your Anthropic API key and select a Claude model for translations."
+msgstr "Gib deinen Anthropic API-Schlüssel ein und wähle ein Claude-Modell für Übersetzungen."
 
-#: includes/class-wptomedium-settings.php:67
-msgid "Automatic (SDK decides)"
-msgstr "Automatisch (SDK entscheidet)"
+#: includes/class-wptomedium-settings.php
+msgid "Current key: %s"
+msgstr "Aktueller Schlüssel: %s"
 
-#: includes/class-wptomedium-translator.php:52
-#: includes/class-wptomedium-workflow.php:100
+#: includes/class-wptomedium-settings.php
+msgid "Get your API key from %s"
+msgstr "Hol dir deinen API-Schlüssel von %s"
+
+#: includes/class-wptomedium-translator.php
+#: includes/class-wptomedium-workflow.php
 msgid "Post not found."
 msgstr "Beitrag nicht gefunden."
 
-#: includes/class-wptomedium-translator.php:61
+#: includes/class-wptomedium-translator.php
 msgid "Post has no content."
 msgstr "Beitrag hat keinen Inhalt."
 
-#: includes/class-wptomedium-translator.php:72
-msgid "WP AI Client SDK not available."
-msgstr "WP AI Client SDK nicht verfügbar."
+#: includes/class-wptomedium-translator.php
+msgid "Anthropic API key not configured. Please add your API key in Settings."
+msgstr "Anthropic API-Schlüssel nicht konfiguriert. Bitte füge deinen API-Schlüssel in den Einstellungen hinzu."
 
-#: includes/class-wptomedium-translator.php:82
-msgid "No AI provider configured. Please set up AI Credentials in Settings."
-msgstr "Kein KI-Anbieter konfiguriert. Bitte KI-Zugangsdaten in den Einstellungen hinterlegen."
+#: includes/class-wptomedium-translator.php
+msgid "Anthropic SDK not available."
+msgstr "Anthropic SDK nicht verfügbar."
 
-#: includes/class-wptomedium-translator.php:90
+#: includes/class-wptomedium-translator.php
+msgid "Invalid API key."
+msgstr "Ungültiger API-Schlüssel."
+
+#: includes/class-wptomedium-translator.php
+msgid "Rate limit exceeded. Please try again later."
+msgstr "Rate-Limit überschritten. Bitte versuche es später erneut."
+
+#: includes/class-wptomedium-translator.php
+msgid "API error: "
+msgstr "API-Fehler: "
+
+#: includes/class-wptomedium-translator.php
+msgid "Translation failed: "
+msgstr "Übersetzung fehlgeschlagen: "
+
+#: includes/class-wptomedium-translator.php
 msgid "AI returned an empty response."
 msgstr "KI hat eine leere Antwort zurückgegeben."
 
-#: includes/class-wptomedium-translator.php:106
+#: includes/class-wptomedium-translator.php
 msgid "Translation complete."
 msgstr "Übersetzung abgeschlossen."
 
-#: includes/class-wptomedium-workflow.php:32
-#: includes/class-wptomedium-workflow.php:33
+#: includes/class-wptomedium-workflow.php
+#: includes/class-wptomedium-workflow.php
 msgid "Articles"
 msgstr "Artikel"
 
-#: includes/class-wptomedium-workflow.php:41
-#: includes/class-wptomedium-workflow.php:42
-#: wptomedium.php:110
+#: includes/class-wptomedium-workflow.php
+#: includes/class-wptomedium-workflow.php
+#: wptomedium.php
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: includes/class-wptomedium-workflow.php:51
-#: includes/class-wptomedium-workflow.php:127
+#: includes/class-wptomedium-workflow.php
+#: includes/class-wptomedium-workflow.php
 msgid "Review Translation"
 msgstr "Übersetzung prüfen"
 
-#: includes/class-wptomedium-workflow.php:79
+#: includes/class-wptomedium-workflow.php
 msgid "WPtoMedium — Articles"
 msgstr "WPtoMedium — Artikel"
 
-#: includes/class-wptomedium-workflow.php:131
+#: includes/class-wptomedium-workflow.php
 msgid "No translation available. Please translate the post first."
 msgstr "Keine Übersetzung vorhanden. Bitte den Beitrag zuerst übersetzen."
 
-#: includes/class-wptomedium-workflow.php:133
+#: includes/class-wptomedium-workflow.php
 msgid "Back to Articles"
 msgstr "Zurück zu Artikeln"
 
-#: includes/class-wptomedium-workflow.php:139
+#: includes/class-wptomedium-workflow.php
 msgid "Original Title"
 msgstr "Originaltitel"
 
-#: includes/class-wptomedium-workflow.php:143
+#: includes/class-wptomedium-workflow.php
 msgid "Translated Title"
 msgstr "Übersetzter Titel"
 
-#: includes/class-wptomedium-workflow.php:154
+#: includes/class-wptomedium-workflow.php
 msgid "Original (German)"
 msgstr "Original (Deutsch)"
 
-#: includes/class-wptomedium-workflow.php:161
+#: includes/class-wptomedium-workflow.php
 msgid "Translation (English)"
 msgstr "Übersetzung (Englisch)"
 
-#: includes/class-wptomedium-workflow.php:168
+#: includes/class-wptomedium-workflow.php
 msgid "Save Translation"
 msgstr "Übersetzung speichern"
 
-#: includes/class-wptomedium-workflow.php:171
-#: wptomedium.php:100
+#: includes/class-wptomedium-workflow.php
+#: wptomedium.php
 msgid "Retranslate"
 msgstr "Neu übersetzen"
 
-#: includes/class-wptomedium-workflow.php:174
+#: includes/class-wptomedium-workflow.php
 msgid "Copy as HTML"
 msgstr "Als HTML kopieren"
 
-#: includes/class-wptomedium-workflow.php:177
+#: includes/class-wptomedium-workflow.php
 msgid "Copy as Markdown"
 msgstr "Als Markdown kopieren"
 
-#: includes/class-wptomedium-workflow.php:182
+#: includes/class-wptomedium-workflow.php
 msgid "Copied!"
 msgstr "Kopiert!"
 
-#: includes/class-wptomedium-workflow.php:195
-#: includes/class-wptomedium-workflow.php:228
-#: includes/class-wptomedium-workflow.php:252
+#: includes/class-wptomedium-workflow.php
+#: includes/class-wptomedium-workflow.php
+#: includes/class-wptomedium-workflow.php
 msgid "Permission denied."
 msgstr "Zugriff verweigert."
 
-#: includes/class-wptomedium-workflow.php:200
-#: includes/class-wptomedium-workflow.php:233
-#: includes/class-wptomedium-workflow.php:257
+#: includes/class-wptomedium-workflow.php
+#: includes/class-wptomedium-workflow.php
+#: includes/class-wptomedium-workflow.php
 msgid "Invalid post ID."
 msgstr "Ungültige Beitrags-ID."
 
-#: includes/class-wptomedium-workflow.php:242
+#: includes/class-wptomedium-workflow.php
 msgid "Translation saved."
 msgstr "Übersetzung gespeichert."
 
-#: includes/class-wptomedium-workflow.php:298
+#: includes/class-wptomedium-workflow.php
 msgid "Title"
 msgstr "Titel"
 
-#: includes/class-wptomedium-workflow.php:299
+#: includes/class-wptomedium-workflow.php
 msgid "Date"
 msgstr "Datum"
 
-#: includes/class-wptomedium-workflow.php:300
+#: includes/class-wptomedium-workflow.php
 msgid "Translation Status"
 msgstr "Übersetzungsstatus"
 
-#: includes/class-wptomedium-workflow.php:349
-#: wptomedium.php:99
+#: includes/class-wptomedium-workflow.php
+#: wptomedium.php
 msgid "Translate"
 msgstr "Übersetzen"
 
-#: includes/class-wptomedium-workflow.php:358
+#: includes/class-wptomedium-workflow.php
 msgid "Review"
 msgstr "Prüfen"
 
-#: includes/class-wptomedium-workflow.php:388
+#: includes/class-wptomedium-workflow.php
 msgid "Not translated"
 msgstr "Nicht übersetzt"
 
-#: includes/class-wptomedium-workflow.php:389
+#: includes/class-wptomedium-workflow.php
 msgid "Pending"
 msgstr "Ausstehend"
 
-#: includes/class-wptomedium-workflow.php:390
+#: includes/class-wptomedium-workflow.php
 msgid "Translated"
 msgstr "Übersetzt"
 
-#: includes/class-wptomedium-workflow.php:391
+#: includes/class-wptomedium-workflow.php
 msgid "Copied"
 msgstr "Kopiert"
 
-#: wptomedium.php:98
+#: wptomedium.php
 msgid "Translating..."
 msgstr "Übersetze …"
 
-#: wptomedium.php:101
+#: wptomedium.php
 msgid "Translation request failed."
 msgstr "Übersetzungsanfrage fehlgeschlagen."
 
-#: wptomedium.php:102
+#: wptomedium.php
 msgid "HTML copied!"
 msgstr "HTML kopiert!"
 
-#: wptomedium.php:103
+#: wptomedium.php
 msgid "Markdown copied!"
 msgstr "Markdown kopiert!"

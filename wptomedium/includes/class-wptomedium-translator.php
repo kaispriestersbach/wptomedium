@@ -3,6 +3,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Anthropic\Client;
+
 /**
  * Handles translation and content conversion for WPtoMedium.
  */
@@ -62,29 +64,64 @@ class WPtoMedium_Translator {
 			);
 		}
 
-		// AI-Prompt bauen.
-		$prompt_text = $this->build_prompt( $post->post_title, $content );
-
-		// AI Client prüfen.
-		if ( ! class_exists( 'WordPress\\AI_Client\\AI_Client' ) ) {
+		// API Key prüfen.
+		$api_key = WPtoMedium_Settings::get_api_key();
+		if ( empty( $api_key ) ) {
 			return array(
 				'success' => false,
-				'message' => __( 'WP AI Client SDK not available.', 'wptomedium' ),
+				'message' => __( 'Anthropic API key not configured. Please add your API key in Settings.', 'wptomedium' ),
 			);
 		}
 
-		$prompt = \WordPress\AI_Client\AI_Client::prompt( $prompt_text )
-			->using_temperature( 0.3 );
-
-		if ( ! $prompt->is_supported_for_text_generation() ) {
+		// Anthropic SDK prüfen.
+		if ( ! class_exists( 'Anthropic\\Client' ) ) {
 			return array(
 				'success' => false,
-				'message' => __( 'No AI provider configured. Please set up AI Credentials in Settings.', 'wptomedium' ),
+				'message' => __( 'Anthropic SDK not available.', 'wptomedium' ),
 			);
 		}
 
-		$response = $prompt->generate_text();
-		if ( empty( $response ) ) {
+		try {
+			$client = new Client( apiKey: $api_key );
+			$model  = WPtoMedium_Settings::get_model();
+
+			$message = $client->messages->create(
+				model: $model,
+				maxTokens: 4096,
+				temperature: 0.3,
+				system: $this->get_system_prompt(),
+				messages: array(
+					array(
+						'role'    => 'user',
+						'content' => $this->build_prompt( $post->post_title, $content ),
+					),
+				),
+			);
+
+			$response_text = $message->content[0]->text;
+		} catch ( \Anthropic\Core\Exceptions\AuthenticationException $e ) {
+			return array(
+				'success' => false,
+				'message' => __( 'Invalid API key.', 'wptomedium' ),
+			);
+		} catch ( \Anthropic\Core\Exceptions\RateLimitException $e ) {
+			return array(
+				'success' => false,
+				'message' => __( 'Rate limit exceeded. Please try again later.', 'wptomedium' ),
+			);
+		} catch ( \Anthropic\Core\Exceptions\APIStatusException $e ) {
+			return array(
+				'success' => false,
+				'message' => __( 'API error: ', 'wptomedium' ) . $e->getMessage(),
+			);
+		} catch ( \Exception $e ) {
+			return array(
+				'success' => false,
+				'message' => __( 'Translation failed: ', 'wptomedium' ) . $e->getMessage(),
+			);
+		}
+
+		if ( empty( $response_text ) ) {
 			return array(
 				'success' => false,
 				'message' => __( 'AI returned an empty response.', 'wptomedium' ),
@@ -92,7 +129,7 @@ class WPtoMedium_Translator {
 		}
 
 		// Response parsen und sanitizen.
-		$parsed             = $this->parse_response( $response );
+		$parsed             = $this->parse_response( $response_text );
 		$translated_content = $this->sanitize_for_medium( $parsed['content'] );
 		$translated_title   = sanitize_text_field( $parsed['title'] );
 
@@ -146,19 +183,31 @@ class WPtoMedium_Translator {
 	}
 
 	/**
-	 * Build the AI translation prompt.
+	 * Get the system prompt for translation.
+	 *
+	 * @return string The system prompt.
+	 */
+	private function get_system_prompt() {
+		return 'You are a professional translator specializing in German to English blog post translation. '
+			. 'Keep all HTML tags exactly as they are. Do not add or remove any HTML tags. '
+			. 'Translate only the text content within the tags. '
+			. 'Maintain the original tone, style, and formatting. '
+			. 'Return ONLY the translated content in this exact format:' . "\n\n"
+			. 'TITLE: [translated title]' . "\n\n"
+			. 'CONTENT:' . "\n"
+			. '[translated HTML content]';
+	}
+
+	/**
+	 * Build the user prompt with the content to translate.
 	 *
 	 * @param string $title   The post title.
 	 * @param string $content The HTML content.
-	 * @return string The translation prompt.
+	 * @return string The user prompt.
 	 */
 	private function build_prompt( $title, $content ) {
 		return sprintf(
-			'Translate the following German blog post to English. Keep all HTML tags exactly as they are. '
-			. 'Do not add or remove any HTML tags. Translate only the text content within the tags. '
-			. 'Return ONLY the translated content in this exact format:'
-			. "\n\nTITLE: [translated title]\n\nCONTENT:\n[translated HTML content]"
-			. "\n\n---\n\nOriginal Title: %s\n\nOriginal Content:\n%s",
+			"Original Title: %s\n\nOriginal Content:\n%s",
 			$title,
 			$content
 		);

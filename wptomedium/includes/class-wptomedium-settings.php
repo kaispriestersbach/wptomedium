@@ -9,11 +9,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 class WPtoMedium_Settings {
 
 	/**
-	 * Option name for AI model preference.
+	 * Option name for Anthropic API key.
 	 *
 	 * @var string
 	 */
-	const OPTION_MODEL = 'wptomedium_model_preference';
+	const OPTION_API_KEY = 'wptomedium_api_key';
+
+	/**
+	 * Option name for Claude model.
+	 *
+	 * @var string
+	 */
+	const OPTION_MODEL = 'wptomedium_model';
 
 	/**
 	 * Register settings with WordPress Settings API.
@@ -21,11 +28,21 @@ class WPtoMedium_Settings {
 	public static function register_settings() {
 		register_setting(
 			'wptomedium_settings',
+			self::OPTION_API_KEY,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+				'default'           => '',
+			)
+		);
+
+		register_setting(
+			'wptomedium_settings',
 			self::OPTION_MODEL,
 			array(
 				'type'              => 'string',
 				'sanitize_callback' => 'sanitize_text_field',
-				'default'           => 'auto',
+				'default'           => 'claude-sonnet-4-20250514',
 			)
 		);
 
@@ -37,8 +54,16 @@ class WPtoMedium_Settings {
 		);
 
 		add_settings_field(
+			'wptomedium_api_key_field',
+			__( 'Anthropic API Key', 'wptomedium' ),
+			array( __CLASS__, 'render_api_key_field' ),
+			'wptomedium-settings',
+			'wptomedium_ai_section'
+		);
+
+		add_settings_field(
 			'wptomedium_model_field',
-			__( 'Preferred AI Model', 'wptomedium' ),
+			__( 'Claude Model', 'wptomedium' ),
 			array( __CLASS__, 'render_model_field' ),
 			'wptomedium-settings',
 			'wptomedium_ai_section'
@@ -46,29 +71,58 @@ class WPtoMedium_Settings {
 	}
 
 	/**
-	 * Render the AI section description with link to AI Credentials.
+	 * Render the AI section description.
 	 */
 	public static function render_ai_section() {
-		$credentials_url = admin_url( 'options-general.php' );
-		printf(
-			'<p>%s <a href="%s">%s</a></p>',
-			esc_html__( 'Configure your AI API key under', 'wptomedium' ),
-			esc_url( $credentials_url ),
-			esc_html__( 'Settings > AI Credentials', 'wptomedium' )
-		);
+		echo '<p>' . esc_html__( 'Enter your Anthropic API key and select a Claude model for translations.', 'wptomedium' ) . '</p>';
 	}
 
 	/**
-	 * Render the model preference dropdown.
+	 * Render the API key input field.
+	 */
+	public static function render_api_key_field() {
+		$api_key = get_option( self::OPTION_API_KEY, '' );
+		$masked  = '';
+		if ( ! empty( $api_key ) ) {
+			$masked = str_repeat( '*', max( 0, strlen( $api_key ) - 4 ) ) . substr( $api_key, -4 );
+		}
+		?>
+		<input
+			type="password"
+			name="<?php echo esc_attr( self::OPTION_API_KEY ); ?>"
+			value="<?php echo esc_attr( $api_key ); ?>"
+			class="regular-text"
+			autocomplete="off"
+		/>
+		<?php if ( ! empty( $masked ) ) : ?>
+			<p class="description">
+				<?php
+				printf(
+					/* translators: %s: masked API key showing only last 4 characters */
+					esc_html__( 'Current key: %s', 'wptomedium' ),
+					'<code>' . esc_html( $masked ) . '</code>'
+				);
+				?>
+			</p>
+		<?php endif; ?>
+		<p class="description">
+			<?php
+			printf(
+				/* translators: %s: link to Anthropic console */
+				esc_html__( 'Get your API key from %s', 'wptomedium' ),
+				'<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>'
+			);
+			?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render the model selection dropdown.
 	 */
 	public static function render_model_field() {
-		$current = get_option( self::OPTION_MODEL, 'auto' );
-		$models  = array(
-			'auto'   => __( 'Automatic (SDK decides)', 'wptomedium' ),
-			'claude' => 'Claude',
-			'gpt'    => 'GPT',
-			'gemini' => 'Gemini',
-		);
+		$current = get_option( self::OPTION_MODEL, 'claude-sonnet-4-20250514' );
+		$models  = self::get_available_models();
 		echo '<select name="' . esc_attr( self::OPTION_MODEL ) . '">';
 		foreach ( $models as $value => $label ) {
 			printf(
@@ -79,6 +133,18 @@ class WPtoMedium_Settings {
 			);
 		}
 		echo '</select>';
+	}
+
+	/**
+	 * Get available Claude models.
+	 *
+	 * @return array<string, string> Model ID => Display name.
+	 */
+	public static function get_available_models() {
+		return array(
+			'claude-sonnet-4-20250514'  => 'Claude Sonnet 4',
+			'claude-haiku-4-5-20251001' => 'Claude Haiku 4.5',
+		);
 	}
 
 	/**
@@ -103,11 +169,20 @@ class WPtoMedium_Settings {
 	}
 
 	/**
-	 * Get the configured model preference.
+	 * Get the configured Anthropic API key.
 	 *
-	 * @return string Model preference or 'auto'.
+	 * @return string API key or empty string.
 	 */
-	public static function get_model_preference() {
-		return get_option( self::OPTION_MODEL, 'auto' );
+	public static function get_api_key() {
+		return get_option( self::OPTION_API_KEY, '' );
+	}
+
+	/**
+	 * Get the configured Claude model ID.
+	 *
+	 * @return string Model ID.
+	 */
+	public static function get_model() {
+		return get_option( self::OPTION_MODEL, 'claude-sonnet-4-20250514' );
 	}
 }
