@@ -17,6 +17,25 @@ composer require wordpress/wp-ai-client wordpress/anthropic-ai-provider
 
 `vendor/` ins Release-ZIP einschließen. Kein Build-Step für JS/CSS.
 
+## Übersetzungen (i18n)
+
+Nach Änderungen an übersetzten Strings (`__()`, `esc_html__()`) oder neuen Strings vor dem Commit die Übersetzungsdateien aktualisieren:
+
+```bash
+# 1. .pot neu generieren
+docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-pot /app /app/languages/wptomedium.pot --domain=wptomedium --package-name="WPtoMedium"
+
+# 2. .po aktualisieren (neue Strings eintragen, deutsche Übersetzung ergänzen)
+#    → wptomedium/languages/wptomedium-de_DE.po manuell pflegen
+
+# 3. .mo kompilieren
+docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-mo /app/languages/
+```
+
+- JS-Strings werden via `wp_localize_script` in `wptomedium.php` übergeben — neue JS-Strings dort als `__( '...', 'wptomedium' )` eintragen und in `admin/js/wptomedium-admin.js` über `wptomediumData.*` verwenden.
+- Locale: `de_DE` (WordPress Standard-Deutsch).
+- Alle drei Dateien (`.pot`, `.po`, `.mo`) committen.
+
 ## Dateistruktur
 
 ```

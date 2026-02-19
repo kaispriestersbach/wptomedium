@@ -1,0 +1,216 @@
+# Copyright (C) 2026 Kai
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: WPtoMedium 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/your-repo/wptomedium/issues\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: German\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-02-19T11:17:05+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: wptomedium\n"
+
+#. Plugin Name of the plugin
+#: wptomedium.php
+#: includes/class-wptomedium-workflow.php:21
+#: includes/class-wptomedium-workflow.php:22
+msgid "WPtoMedium"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: wptomedium.php
+msgid "https://github.com/your-repo/wptomedium"
+msgstr ""
+
+#. Description of the plugin
+#: wptomedium.php
+msgid "Translate German WordPress posts to English via AI and copy to clipboard for Medium."
+msgstr ""
+
+#. Author of the plugin
+#: wptomedium.php
+msgid "Kai"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:34
+msgid "AI Configuration"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:41
+msgid "Preferred AI Model"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:55
+msgid "Configure your AI API key under"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:57
+msgid "Settings > AI Credentials"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:67
+msgid "Automatic (SDK decides)"
+msgstr ""
+
+#: includes/class-wptomedium-translator.php:52
+#: includes/class-wptomedium-workflow.php:100
+msgid "Post not found."
+msgstr ""
+
+#: includes/class-wptomedium-translator.php:61
+msgid "Post has no content."
+msgstr ""
+
+#: includes/class-wptomedium-translator.php:72
+msgid "WP AI Client SDK not available."
+msgstr ""
+
+#: includes/class-wptomedium-translator.php:82
+msgid "No AI provider configured. Please set up AI Credentials in Settings."
+msgstr ""
+
+#: includes/class-wptomedium-translator.php:90
+msgid "AI returned an empty response."
+msgstr ""
+
+#: includes/class-wptomedium-translator.php:106
+msgid "Translation complete."
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:32
+#: includes/class-wptomedium-workflow.php:33
+msgid "Articles"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:41
+#: includes/class-wptomedium-workflow.php:42
+#: wptomedium.php:110
+msgid "Settings"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:51
+#: includes/class-wptomedium-workflow.php:127
+msgid "Review Translation"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:79
+msgid "WPtoMedium — Articles"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:131
+msgid "No translation available. Please translate the post first."
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:133
+msgid "Back to Articles"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:139
+msgid "Original Title"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:143
+msgid "Translated Title"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:154
+msgid "Original (German)"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:161
+msgid "Translation (English)"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:168
+msgid "Save Translation"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:171
+#: wptomedium.php:100
+msgid "Retranslate"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:174
+msgid "Copy as HTML"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:177
+msgid "Copy as Markdown"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:182
+msgid "Copied!"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:195
+#: includes/class-wptomedium-workflow.php:228
+#: includes/class-wptomedium-workflow.php:252
+msgid "Permission denied."
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:200
+#: includes/class-wptomedium-workflow.php:233
+#: includes/class-wptomedium-workflow.php:257
+msgid "Invalid post ID."
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:242
+msgid "Translation saved."
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:298
+msgid "Title"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:299
+msgid "Date"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:300
+msgid "Translation Status"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:349
+#: wptomedium.php:99
+msgid "Translate"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:358
+msgid "Review"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:388
+msgid "Not translated"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:389
+msgid "Pending"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:390
+msgid "Translated"
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:391
+msgid "Copied"
+msgstr ""
+
+#: wptomedium.php:98
+msgid "Translating..."
+msgstr ""
+
+#: wptomedium.php:101
+msgid "Translation request failed."
+msgstr ""
+
+#: wptomedium.php:102
+msgid "HTML copied!"
+msgstr ""
+
+#: wptomedium.php:103
+msgid "Markdown copied!"
+msgstr ""

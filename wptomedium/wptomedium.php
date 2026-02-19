@@ -6,6 +6,7 @@
  * Version:     1.0.0
  * Author:      Kai
  * Text Domain: wptomedium
+ * Domain Path: /languages
  * Requires at least: 6.0
  * Requires PHP: 7.4
  * License:     GPLv2 or later
@@ -20,6 +21,16 @@ define( 'WPTOMEDIUM_VERSION', '1.0.0' );
 define( 'WPTOMEDIUM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WPTOMEDIUM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WPTOMEDIUM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+
+// Textdomain laden.
+add_action( 'plugins_loaded', 'wptomedium_load_textdomain' );
+
+/**
+ * Load plugin textdomain for translations.
+ */
+function wptomedium_load_textdomain() {
+	load_plugin_textdomain( 'wptomedium', false, dirname( WPTOMEDIUM_PLUGIN_BASENAME ) . '/languages' );
+}
 
 // Vendor Autoloader (WP AI Client SDK) — mit Guard für WP 7.0-Kompatibilität.
 if ( ! class_exists( 'WordPress\\AI_Client\\AI_Client' ) ) {
@@ -82,8 +93,14 @@ function wptomedium_enqueue_admin_assets( $hook_suffix ) {
 	);
 
 	wp_localize_script( 'wptomedium-admin', 'wptomediumData', array(
-		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-		'nonce'   => wp_create_nonce( 'wptomedium_nonce' ),
+		'ajaxUrl'          => admin_url( 'admin-ajax.php' ),
+		'nonce'            => wp_create_nonce( 'wptomedium_nonce' ),
+		'translating'      => __( 'Translating...', 'wptomedium' ),
+		'translate'        => __( 'Translate', 'wptomedium' ),
+		'retranslate'      => __( 'Retranslate', 'wptomedium' ),
+		'requestFailed'    => __( 'Translation request failed.', 'wptomedium' ),
+		'htmlCopied'       => __( 'HTML copied!', 'wptomedium' ),
+		'markdownCopied'   => __( 'Markdown copied!', 'wptomedium' ),
 	) );
 }
 

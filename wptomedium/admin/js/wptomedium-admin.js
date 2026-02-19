@@ -21,7 +21,7 @@
 		var $link  = $( this );
 		var postId = $link.data( 'post-id' );
 
-		$link.text( 'Translating...' ).addClass( 'disabled' );
+		$link.text( wptomediumData.translating ).addClass( 'disabled' );
 
 		$.post( wptomediumData.ajaxUrl, {
 			action:  'wptomedium_translate',
@@ -33,12 +33,12 @@
 				window.location.href = response.data.review_url;
 			} else {
 				alert( response.data );
-				$link.text( 'Translate' ).removeClass( 'disabled' );
+				$link.text( wptomediumData.translate ).removeClass( 'disabled' );
 			}
 		} )
 		.fail( function() {
-			alert( 'Translation request failed.' );
-			$link.text( 'Translate' ).removeClass( 'disabled' );
+			alert( wptomediumData.requestFailed );
+			$link.text( wptomediumData.translate ).removeClass( 'disabled' );
 		} );
 	} );
 
@@ -76,7 +76,7 @@
 		var $btn   = $( this );
 		var postId = $btn.data( 'post-id' );
 
-		$btn.prop( 'disabled', true ).text( 'Translating...' );
+		$btn.prop( 'disabled', true ).text( wptomediumData.translating );
 
 		$.post( wptomediumData.ajaxUrl, {
 			action:  'wptomedium_translate',
@@ -88,7 +88,7 @@
 				window.location.reload();
 			} else {
 				alert( response.data );
-				$btn.prop( 'disabled', false ).text( 'Retranslate' );
+				$btn.prop( 'disabled', false ).text( wptomediumData.retranslate );
 			}
 		} );
 	} );
@@ -104,7 +104,7 @@
 		}
 
 		navigator.clipboard.writeText( content ).then( function() {
-			showToast( 'HTML copied!' );
+			showToast( wptomediumData.htmlCopied );
 		} );
 	} );
 
@@ -120,7 +120,7 @@
 		.done( function( response ) {
 			if ( response.success ) {
 				navigator.clipboard.writeText( response.data.markdown ).then( function() {
-					showToast( 'Markdown copied!' );
+					showToast( wptomediumData.markdownCopied );
 				} );
 			} else {
 				alert( response.data );
