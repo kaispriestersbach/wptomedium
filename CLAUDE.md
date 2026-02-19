@@ -1,0 +1,143 @@
+# WPtoMedium
+
+WordPress-Plugin: Deutsche Blogartikel via AI (WP AI Client SDK) ins Englische übersetzen, Side-by-Side reviewen/bearbeiten, als HTML oder Markdown in die Zwischenablage kopieren. Human-in-the-Loop — nichts wird ohne Freigabe kopiert.
+
+## Schlüsselentscheidungen
+
+- **Keine Medium API** — Medium vergibt seit 01/2025 keine Integration Tokens mehr. Output ist Copy-to-Clipboard.
+- **WP AI Client SDK** — provider-agnostisch (Claude, GPT, Gemini). Feature-Detection via `is_supported_for_text_generation()`.
+- **Vendor-Bundling** — `vendor/` wird im Release-ZIP mitgeliefert. User braucht kein Composer. Autoloader mit `class_exists()`-Guard für WP 7.0-Kompatibilität.
+
+## Build
+
+```bash
+cd wptomedium/
+composer require wordpress/wp-ai-client wordpress/anthropic-ai-provider
+```
+
+`vendor/` ins Release-ZIP einschließen. Kein Build-Step für JS/CSS.
+
+## Dateistruktur
+
+```
+wptomedium/
+  wptomedium.php                    # Bootstrap, Autoloader, Hooks, Menü, Assets
+  uninstall.php                     # Cleanup bei Deinstallation
+  readme.txt                        # WordPress readme
+  composer.json
+  vendor/                           # Gebündelte Dependencies
+  includes/
+    class-wptomedium-settings.php   # Settings-Seite (AI-Model-Preference)
+    class-wptomedium-translator.php # Übersetzung + Gutenberg→Medium-HTML + Markdown
+    class-wptomedium-workflow.php   # AJAX-Handler, Artikel-Liste, Review-Seite
+  admin/
+    css/wptomedium-admin.css        # Side-by-Side Review Styles
+    js/wptomedium-admin.js          # AJAX, Copy-to-Clipboard, Toast-UI
+```
+
+## Architektur
+
+### Datenfluss
+
+```
+Post auswählen → "Übersetzen" (AJAX)
+  → Gutenberg→Medium-HTML Pipeline (prepare_content)
+  → AI-Übersetzung (WP AI Client SDK)
+  → sanitize_for_medium (wp_kses)
+  → Post Meta speichern
+  → Review-Seite: Side-by-Side (Original read-only | Übersetzung editierbar via wp_editor)
+  → Copy-to-Clipboard (HTML oder Markdown)
+```
+
+### Post Meta
+
+| Meta Key | Werte | Zweck |
+|---|---|---|
+| `_wptomedium_translation` | HTML | Englische Übersetzung |
+| `_wptomedium_translated_title` | string | Übersetzter Titel |
+| `_wptomedium_status` | `pending` / `translated` / `copied` | Workflow-Status |
+
+### AJAX-Endpunkte (nur `wp_ajax_`, kein `nopriv`)
+
+- `wp_ajax_wptomedium_translate` — Übersetzung starten
+- `wp_ajax_wptomedium_save` — Bearbeitete Übersetzung speichern
+- `wp_ajax_wptomedium_copy_markdown` — HTML→Markdown serverseitig konvertieren
+
+### Admin-Seiten (Menüpunkt "WPtoMedium")
+
+1. **Settings** (`wptomedium-settings`) — Link zu AI Credentials, Model-Preference
+2. **Artikel-Auswahl** (`wptomedium-articles`) — `WP_List_Table`, Status-Spalte, Row-Actions
+3. **Review & Copy** (`wptomedium-review`) — Side-by-Side, TinyMCE mit eingeschränkter Toolbar (nur Medium-kompatible Tags)
+
+### Translator-Klasse (`WPtoMedium_Translator`)
+
+- `translate( $post_id )` — Hauptmethode
+- `prepare_content( $post_id )` — Gutenberg→Medium-HTML Pipeline
+- `build_prompt( $title, $content )` — AI-Prompt
+- `parse_response( $response )` — Titel + Content extrahieren
+- `sanitize_for_medium( $html )` — `wp_kses()` mit Medium-Tag-Set
+- `to_markdown( $html )` — HTML→Markdown
+
+### Medium-kompatible Tags
+
+Erlaubt: `h1`, `h2`, `p`, `a[href]`, `strong`, `b`, `em`, `i`, `blockquote`, `figure`, `figcaption`, `img[src,alt]`, `ul`, `ol`, `li`, `pre`, `code`, `hr`, `br`
+Nicht unterstützt: `h3`-`h6`, `table`, `div`, `span`, CSS-Klassen, `iframe`
+
+### Content-Pipeline (vor Übersetzung)
+
+1. `apply_filters( 'the_content' )` — Gutenberg rendert zu HTML
+2. Block-Kommentare entfernen (`<!-- wp:* -->`)
+3. `h3`-`h6` → `h2`
+4. CSS-Klassen und `style`-Attribute entfernen
+5. `table` → Text-Absätze
+6. Galerien → einzelne `figure`-Elemente
+7. `wp_kses()` als finaler Sanitizer
+
+## Coding Standards
+
+### PHP (WordPress)
+
+- Tabs, keine Spaces
+- `snake_case` Funktionen/Variablen, `Capitalized_Words` Klassen, `UPPER_CASE` Konstanten
+- Yoda Conditions: `if ( true === $value )`
+- Long Array Syntax: `array( 1, 2, 3 )`
+- Spaces in Klammern: `if ( $foo ) {`, `func( $param )`
+- `elseif` statt `else if`, `require_once` ohne Klammern
+- PHPDoc für alle Funktionen, Strict Comparisons (`===`/`!==`)
+- Jede Datei: `if ( ! defined( 'ABSPATH' ) ) { exit; }`
+- Trailing Comma in mehrzeiligen Arrays
+
+### JavaScript
+
+- camelCase, Tabs, Single Quotes, Spaces in Klammern
+- `const`/`let` statt `var`, Semikolons immer
+- jQuery-Wrapper: `( function( $ ) { ... } )( jQuery );`
+
+### CSS
+
+- Tabs, Lowercase + Hyphens: `.wptomedium-review-panel`
+- Properties: Display → Position → Box Model → Colors
+
+### Plugin-Konventionen
+
+- Text Domain: `wptomedium`, alle Strings Englisch mit `__()`/`esc_html__()`
+- Nonces + `current_user_can( 'manage_options' )` bei allen AJAX-Requests
+- Input: `sanitize_text_field()`, `wp_kses_post()`, `absint()`
+- Output: `esc_html()`, `esc_attr()`, `esc_url()`
+- Mit `WP_DEBUG` aktiv entwickeln
+
+## Voraussetzungen
+
+- WordPress 6.x+, PHP 7.4+
+- Keine separaten Plugins nötig (Dependencies gebündelt)
+
+## Implementierungsreihenfolge
+
+1. Plugin-Skeleton (`wptomedium.php`)
+2. Settings-Seite
+3. Translator-Klasse
+4. Artikel-Liste (`WP_List_Table`)
+5. Review-Seite (Side-by-Side, `wp_editor`)
+6. AJAX-Workflow
+7. CSS/JS (Admin-Styles, Copy-to-Clipboard, Toast)
+8. readme.txt

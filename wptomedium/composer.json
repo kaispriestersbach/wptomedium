@@ -1,0 +1,10 @@
+{
+	"name": "kai/wptomedium",
+	"description": "WordPress plugin to translate German posts to English for Medium",
+	"type": "wordpress-plugin",
+	"require": {
+		"php": ">=7.4",
+		"wordpress/wp-ai-client": "*",
+		"wordpress/anthropic-ai-provider": "*"
+	}
+}
