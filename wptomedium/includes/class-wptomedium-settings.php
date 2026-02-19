@@ -23,6 +23,48 @@ class WPtoMedium_Settings {
 	const OPTION_MODEL = 'wptomedium_model';
 
 	/**
+	 * Option name for system prompt.
+	 *
+	 * @var string
+	 */
+	const OPTION_SYSTEM_PROMPT = 'wptomedium_system_prompt';
+
+	/**
+	 * Option name for max tokens.
+	 *
+	 * @var string
+	 */
+	const OPTION_MAX_TOKENS = 'wptomedium_max_tokens';
+
+	/**
+	 * Option name for temperature.
+	 *
+	 * @var string
+	 */
+	const OPTION_TEMPERATURE = 'wptomedium_temperature';
+
+	/**
+	 * Default system prompt (editable part, without format instructions).
+	 *
+	 * @var string
+	 */
+	const DEFAULT_SYSTEM_PROMPT = 'You are a professional translator specializing in German to English blog post translation. Keep all HTML tags exactly as they are. Do not add or remove any HTML tags. Translate only the text content within the tags. Maintain the original tone, style, and formatting.';
+
+	/**
+	 * Default max tokens.
+	 *
+	 * @var int
+	 */
+	const DEFAULT_MAX_TOKENS = 4096;
+
+	/**
+	 * Default temperature.
+	 *
+	 * @var float
+	 */
+	const DEFAULT_TEMPERATURE = 0.3;
+
+	/**
 	 * Transient name for cached models list.
 	 *
 	 * @var string
@@ -91,6 +133,68 @@ class WPtoMedium_Settings {
 			array( __CLASS__, 'render_model_field' ),
 			'wptomedium-settings',
 			'wptomedium_ai_section'
+		);
+
+		// Translation Settings.
+		register_setting(
+			'wptomedium_settings',
+			self::OPTION_SYSTEM_PROMPT,
+			array(
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_textarea_field',
+				'default'           => self::DEFAULT_SYSTEM_PROMPT,
+			)
+		);
+
+		register_setting(
+			'wptomedium_settings',
+			self::OPTION_MAX_TOKENS,
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_max_tokens' ),
+				'default'           => self::DEFAULT_MAX_TOKENS,
+			)
+		);
+
+		register_setting(
+			'wptomedium_settings',
+			self::OPTION_TEMPERATURE,
+			array(
+				'type'              => 'number',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_temperature' ),
+				'default'           => self::DEFAULT_TEMPERATURE,
+			)
+		);
+
+		add_settings_section(
+			'wptomedium_translation_section',
+			__( 'Translation Settings', 'wptomedium' ),
+			array( __CLASS__, 'render_translation_section' ),
+			'wptomedium-settings'
+		);
+
+		add_settings_field(
+			'wptomedium_system_prompt_field',
+			__( 'System Prompt', 'wptomedium' ),
+			array( __CLASS__, 'render_system_prompt_field' ),
+			'wptomedium-settings',
+			'wptomedium_translation_section'
+		);
+
+		add_settings_field(
+			'wptomedium_max_tokens_field',
+			__( 'Max Tokens', 'wptomedium' ),
+			array( __CLASS__, 'render_max_tokens_field' ),
+			'wptomedium-settings',
+			'wptomedium_translation_section'
+		);
+
+		add_settings_field(
+			'wptomedium_temperature_field',
+			__( 'Temperature', 'wptomedium' ),
+			array( __CLASS__, 'render_temperature_field' ),
+			'wptomedium-settings',
+			'wptomedium_translation_section'
 		);
 	}
 
@@ -226,6 +330,98 @@ class WPtoMedium_Settings {
 	}
 
 	/**
+	 * Render the translation section description.
+	 */
+	public static function render_translation_section() {
+		echo '<p>' . esc_html__( 'Configure how the AI translates your posts.', 'wptomedium' ) . '</p>';
+	}
+
+	/**
+	 * Render the system prompt textarea.
+	 */
+	public static function render_system_prompt_field() {
+		$value = get_option( self::OPTION_SYSTEM_PROMPT, self::DEFAULT_SYSTEM_PROMPT );
+		?>
+		<textarea
+			name="<?php echo esc_attr( self::OPTION_SYSTEM_PROMPT ); ?>"
+			id="wptomedium-system-prompt"
+			class="wptomedium-prompt-textarea"
+			rows="10"
+		><?php echo esc_textarea( $value ); ?></textarea>
+		<p class="description">
+			<?php esc_html_e( 'This prompt tells the AI how to translate. The output format instructions are added automatically.', 'wptomedium' ); ?>
+		</p>
+		<button type="button" class="button wptomedium-restore-prompt">
+			<?php esc_html_e( 'Restore Default', 'wptomedium' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Render the max tokens input field.
+	 */
+	public static function render_max_tokens_field() {
+		$value = get_option( self::OPTION_MAX_TOKENS, self::DEFAULT_MAX_TOKENS );
+		?>
+		<input
+			type="number"
+			name="<?php echo esc_attr( self::OPTION_MAX_TOKENS ); ?>"
+			value="<?php echo esc_attr( $value ); ?>"
+			min="1024"
+			max="128000"
+			step="1"
+			class="small-text"
+		/>
+		<p class="description">
+			<?php esc_html_e( 'Maximum number of tokens in the AI response (1024–128000).', 'wptomedium' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render the temperature input field.
+	 */
+	public static function render_temperature_field() {
+		$value = get_option( self::OPTION_TEMPERATURE, self::DEFAULT_TEMPERATURE );
+		?>
+		<input
+			type="number"
+			name="<?php echo esc_attr( self::OPTION_TEMPERATURE ); ?>"
+			value="<?php echo esc_attr( $value ); ?>"
+			min="0"
+			max="1"
+			step="0.1"
+			class="small-text"
+		/>
+		<p class="description">
+			<?php esc_html_e( 'Controls randomness of the translation (0 = deterministic, 1 = creative).', 'wptomedium' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Sanitize max tokens value, clamping to valid range.
+	 *
+	 * @param mixed $value Input value.
+	 * @return int Clamped integer.
+	 */
+	public static function sanitize_max_tokens( $value ) {
+		$value = absint( $value );
+		return max( 1024, min( 128000, $value ) );
+	}
+
+	/**
+	 * Sanitize temperature value, clamping to valid range.
+	 *
+	 * @param mixed $value Input value.
+	 * @return float Clamped float.
+	 */
+	public static function sanitize_temperature( $value ) {
+		$value = (float) $value;
+		return max( 0.0, min( 1.0, round( $value, 1 ) ) );
+	}
+
+	/**
 	 * Render the settings page.
 	 */
 	public static function render_page() {
@@ -262,6 +458,33 @@ class WPtoMedium_Settings {
 	 */
 	public static function get_model() {
 		return get_option( self::OPTION_MODEL, 'claude-sonnet-4-20250514' );
+	}
+
+	/**
+	 * Get the configured system prompt (editable part only).
+	 *
+	 * @return string System prompt.
+	 */
+	public static function get_system_prompt() {
+		return get_option( self::OPTION_SYSTEM_PROMPT, self::DEFAULT_SYSTEM_PROMPT );
+	}
+
+	/**
+	 * Get the configured max tokens.
+	 *
+	 * @return int Max tokens.
+	 */
+	public static function get_max_tokens() {
+		return (int) get_option( self::OPTION_MAX_TOKENS, self::DEFAULT_MAX_TOKENS );
+	}
+
+	/**
+	 * Get the configured temperature.
+	 *
+	 * @return float Temperature.
+	 */
+	public static function get_temperature() {
+		return (float) get_option( self::OPTION_TEMPERATURE, self::DEFAULT_TEMPERATURE );
 	}
 
 	/**

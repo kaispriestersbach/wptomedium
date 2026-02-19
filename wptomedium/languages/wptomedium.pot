@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPtoMedium 1.0.0\n"
+"Project-Id-Version: WPtoMedium 1.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/app\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-19T14:30:14+00:00\n"
+"POT-Creation-Date: 2026-02-19T15:19:18+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wptomedium\n"
@@ -36,86 +36,123 @@ msgstr ""
 msgid "Kai"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:75
+#: includes/class-wptomedium-settings.php:117
 msgid "AI Configuration"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:82
+#: includes/class-wptomedium-settings.php:124
 msgid "Anthropic API Key"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:90
+#: includes/class-wptomedium-settings.php:132
 msgid "Claude Model"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:101
+#: includes/class-wptomedium-settings.php:171
+msgid "Translation Settings"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:178
+msgid "System Prompt"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:186
+msgid "Max Tokens"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:194
+msgid "Temperature"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:205
 msgid "Enter your Anthropic API key and select a Claude model for translations."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:122
+#: includes/class-wptomedium-settings.php:226
 #: wptomedium.php:98
 msgid "Validate Key"
 msgstr ""
 
 #. translators: %s: masked API key showing only last 4 characters
-#: includes/class-wptomedium-settings.php:130
+#: includes/class-wptomedium-settings.php:234
 #, php-format
 msgid "Current key: %s"
 msgstr ""
 
 #. translators: %s: link to Anthropic console
-#: includes/class-wptomedium-settings.php:140
+#: includes/class-wptomedium-settings.php:244
 #, php-format
 msgid "Get your API key from %s"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:166
+#: includes/class-wptomedium-settings.php:270
 #: wptomedium.php:100
 msgid "Refresh Models"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:193
+#: includes/class-wptomedium-settings.php:297
 #: includes/class-wptomedium-translator.php:80
 msgid "Anthropic SDK not available."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:209
+#: includes/class-wptomedium-settings.php:313
 msgid "No Claude models found."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:216
+#: includes/class-wptomedium-settings.php:320
 #: includes/class-wptomedium-translator.php:105
 msgid "Invalid API key."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:218
+#: includes/class-wptomedium-settings.php:322
 msgid "Rate limit exceeded. Key may be valid — try again later."
 msgstr ""
 
 #. translators: %s: error message from the API
-#: includes/class-wptomedium-settings.php:222
+#: includes/class-wptomedium-settings.php:326
 #, php-format
 msgid "Could not fetch models: %s"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:276
-#: includes/class-wptomedium-settings.php:303
+#: includes/class-wptomedium-settings.php:336
+msgid "Configure how the AI translates your posts."
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:352
+msgid "This prompt tells the AI how to translate. The output format instructions are added automatically."
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:355
+#: wptomedium.php:102
+msgid "Restore Default"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:376
+msgid "Maximum number of tokens in the AI response (1024–128000)."
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:397
+msgid "Controls randomness of the translation (0 = deterministic, 1 = creative)."
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:499
+#: includes/class-wptomedium-settings.php:526
 msgid "Unauthorized."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:281
+#: includes/class-wptomedium-settings.php:504
 msgid "Please enter an API key."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:291
+#: includes/class-wptomedium-settings.php:514
 msgid "API key is valid!"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:308
+#: includes/class-wptomedium-settings.php:531
 msgid "No API key configured."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:320
+#: includes/class-wptomedium-settings.php:543
 msgid "Models refreshed!"
 msgstr ""
 
@@ -159,7 +196,7 @@ msgstr ""
 
 #: includes/class-wptomedium-workflow.php:41
 #: includes/class-wptomedium-workflow.php:42
-#: wptomedium.php:127
+#: wptomedium.php:129
 msgid "Settings"
 msgstr ""
 

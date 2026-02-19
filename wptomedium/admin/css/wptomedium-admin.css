@@ -115,6 +115,13 @@
 	font-weight: 600;
 }
 
+/* System Prompt Textarea */
+.wptomedium-prompt-textarea {
+	width: 100%;
+	min-height: 200px;
+	font-family: monospace;
+}
+
 /* Responsive */
 @media screen and (max-width: 960px) {
 	.wptomedium-review-container,

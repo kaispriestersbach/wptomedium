@@ -98,6 +98,8 @@ function wptomedium_enqueue_admin_assets( $hook_suffix ) {
 		'validateKey'      => __( 'Validate Key', 'wptomedium' ),
 		'refreshing'       => __( 'Refreshing...', 'wptomedium' ),
 		'refreshModels'    => __( 'Refresh Models', 'wptomedium' ),
+		'defaultPrompt'    => WPtoMedium_Settings::DEFAULT_SYSTEM_PROMPT,
+		'restoreDefault'   => __( 'Restore Default', 'wptomedium' ),
 	) );
 }
 

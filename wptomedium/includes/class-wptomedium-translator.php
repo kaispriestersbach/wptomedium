@@ -87,8 +87,8 @@ class WPtoMedium_Translator {
 
 			$message = $client->messages->create(
 				model: $model,
-				maxTokens: 4096,
-				temperature: 0.3,
+				maxTokens: WPtoMedium_Settings::get_max_tokens(),
+				temperature: WPtoMedium_Settings::get_temperature(),
 				system: $this->get_system_prompt(),
 				messages: array(
 					array(
@@ -188,14 +188,15 @@ class WPtoMedium_Translator {
 	 * @return string The system prompt.
 	 */
 	private function get_system_prompt() {
-		return 'You are a professional translator specializing in German to English blog post translation. '
-			. 'Keep all HTML tags exactly as they are. Do not add or remove any HTML tags. '
-			. 'Translate only the text content within the tags. '
-			. 'Maintain the original tone, style, and formatting. '
+		$editable = WPtoMedium_Settings::get_system_prompt();
+
+		$format = "\n\n"
 			. 'Return ONLY the translated content in this exact format:' . "\n\n"
 			. 'TITLE: [translated title]' . "\n\n"
 			. 'CONTENT:' . "\n"
 			. '[translated HTML content]';
+
+		return $editable . $format;
 	}
 
 	/**

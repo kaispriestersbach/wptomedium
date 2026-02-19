@@ -181,6 +181,11 @@
 		} );
 	} );
 
+	// Restore Default Prompt.
+	$( document ).on( 'click', '.wptomedium-restore-prompt', function() {
+		$( '#wptomedium-system-prompt' ).val( wptomediumData.defaultPrompt );
+	} );
+
 	// Refresh Models.
 	$( document ).on( 'click', '.wptomedium-refresh-models', function() {
 		var $btn    = $( this );

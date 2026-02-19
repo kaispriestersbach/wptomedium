@@ -290,3 +290,43 @@ msgstr "Modelle aktualisieren"
 #: wptomedium.php
 msgid "Refreshing..."
 msgstr "Aktualisiere …"
+
+#: wptomedium.php
+msgid "Restore Default"
+msgstr "Standard wiederherstellen"
+
+#: includes/class-wptomedium-settings.php
+msgid "Translation Settings"
+msgstr "Übersetzungseinstellungen"
+
+#: includes/class-wptomedium-settings.php
+msgid "Configure how the AI translates your posts."
+msgstr "Konfiguriere, wie die KI deine Beiträge übersetzt."
+
+#: includes/class-wptomedium-settings.php
+msgid "System Prompt"
+msgstr "System-Prompt"
+
+#: includes/class-wptomedium-settings.php
+msgid "This prompt tells the AI how to translate. The output format instructions are added automatically."
+msgstr "Dieser Prompt teilt der KI mit, wie übersetzt werden soll. Die Formatanweisungen für die Ausgabe werden automatisch ergänzt."
+
+#: includes/class-wptomedium-settings.php
+msgid "Restore Default"
+msgstr "Standard wiederherstellen"
+
+#: includes/class-wptomedium-settings.php
+msgid "Max Tokens"
+msgstr "Max Tokens"
+
+#: includes/class-wptomedium-settings.php
+msgid "Maximum number of tokens in the AI response (1024–128000)."
+msgstr "Maximale Anzahl an Tokens in der KI-Antwort (1024–128000)."
+
+#: includes/class-wptomedium-settings.php
+msgid "Temperature"
+msgstr "Temperature"
+
+#: includes/class-wptomedium-settings.php
+msgid "Controls randomness of the translation (0 = deterministic, 1 = creative)."
+msgstr "Steuert die Zufälligkeit der Übersetzung (0 = deterministisch, 1 = kreativ)."
