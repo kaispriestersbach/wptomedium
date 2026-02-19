@@ -23,6 +23,30 @@ class WPtoMedium_Settings {
 	const OPTION_MODEL = 'wptomedium_model';
 
 	/**
+	 * Transient name for cached models list.
+	 *
+	 * @var string
+	 */
+	const TRANSIENT_MODELS = 'wptomedium_models_cache';
+
+	/**
+	 * Cache TTL for models list in seconds (12 hours).
+	 *
+	 * @var int
+	 */
+	const MODELS_CACHE_TTL = 43200;
+
+	/**
+	 * Fallback models when API is not available.
+	 *
+	 * @var array<string, string>
+	 */
+	const FALLBACK_MODELS = array(
+		'claude-sonnet-4-20250514'  => 'Claude Sonnet 4',
+		'claude-haiku-4-5-20251001' => 'Claude Haiku 4.5',
+	);
+
+	/**
 	 * Register settings with WordPress Settings API.
 	 */
 	public static function register_settings() {
@@ -127,7 +151,7 @@ class WPtoMedium_Settings {
 	public static function render_model_field() {
 		$current = get_option( self::OPTION_MODEL, 'claude-sonnet-4-20250514' );
 		$models  = self::get_available_models();
-		echo '<select name="' . esc_attr( self::OPTION_MODEL ) . '">';
+		echo '<select id="wptomedium-model-select" name="' . esc_attr( self::OPTION_MODEL ) . '">';
 		foreach ( $models as $value => $label ) {
 			printf(
 				'<option value="%s" %s>%s</option>',
@@ -137,18 +161,68 @@ class WPtoMedium_Settings {
 			);
 		}
 		echo '</select>';
+		?>
+		<button type="button" class="button wptomedium-refresh-models">
+			<?php esc_html_e( 'Refresh Models', 'wptomedium' ); ?>
+		</button>
+		<span class="wptomedium-refresh-result" style="display:none; margin-left:10px;"></span>
+		<?php
 	}
 
 	/**
-	 * Get available Claude models.
+	 * Get available Claude models from cache or fallback.
 	 *
 	 * @return array<string, string> Model ID => Display name.
 	 */
 	public static function get_available_models() {
-		return array(
-			'claude-sonnet-4-20250514'  => 'Claude Sonnet 4',
-			'claude-haiku-4-5-20251001' => 'Claude Haiku 4.5',
-		);
+		$cached = get_transient( self::TRANSIENT_MODELS );
+		if ( is_array( $cached ) && ! empty( $cached ) ) {
+			return $cached;
+		}
+		return self::FALLBACK_MODELS;
+	}
+
+	/**
+	 * Fetch available Claude models from the Anthropic API.
+	 *
+	 * @param string $api_key Anthropic API key.
+	 * @return array<string, string>|WP_Error Model ID => Display name, or WP_Error on failure.
+	 */
+	public static function fetch_models_from_api( $api_key ) {
+		if ( ! class_exists( 'Anthropic\\Client' ) ) {
+			return new \WP_Error( 'sdk_missing', __( 'Anthropic SDK not available.', 'wptomedium' ) );
+		}
+
+		try {
+			$client = new \Anthropic\Client( apiKey: $api_key );
+			$page   = $client->models->list( limit: 1000 );
+			$items  = $page->getItems();
+
+			$models = array();
+			foreach ( $items as $item ) {
+				if ( 0 === strpos( $item->id, 'claude-' ) ) {
+					$models[ $item->id ] = $item->displayName;
+				}
+			}
+
+			if ( empty( $models ) ) {
+				return new \WP_Error( 'no_models', __( 'No Claude models found.', 'wptomedium' ) );
+			}
+
+			set_transient( self::TRANSIENT_MODELS, $models, self::MODELS_CACHE_TTL );
+
+			return $models;
+		} catch ( \Anthropic\Core\Exceptions\AuthenticationException $e ) {
+			return new \WP_Error( 'auth_error', __( 'Invalid API key.', 'wptomedium' ) );
+		} catch ( \Anthropic\Core\Exceptions\RateLimitException $e ) {
+			return new \WP_Error( 'rate_limit', __( 'Rate limit exceeded. Key may be valid — try again later.', 'wptomedium' ) );
+		} catch ( \Exception $e ) {
+			return new \WP_Error( 'api_error', sprintf(
+				/* translators: %s: error message from the API */
+				__( 'Could not fetch models: %s', 'wptomedium' ),
+				$e->getMessage()
+			) );
+		}
 	}
 
 	/**
@@ -192,6 +266,8 @@ class WPtoMedium_Settings {
 
 	/**
 	 * AJAX handler to validate the Anthropic API key.
+	 *
+	 * Uses the models endpoint to validate the key and fetch available models in one call.
 	 */
 	public static function ajax_validate_key() {
 		check_ajax_referer( 'wptomedium_nonce', 'nonce' );
@@ -205,33 +281,44 @@ class WPtoMedium_Settings {
 			wp_send_json_error( __( 'Please enter an API key.', 'wptomedium' ) );
 		}
 
-		if ( ! class_exists( 'Anthropic\\Client' ) ) {
-			wp_send_json_error( __( 'Anthropic SDK not available.', 'wptomedium' ) );
+		$models = self::fetch_models_from_api( $api_key );
+
+		if ( is_wp_error( $models ) ) {
+			wp_send_json_error( $models->get_error_message() );
 		}
 
-		try {
-			$client  = new \Anthropic\Client( apiKey: $api_key );
-			$client->messages->create(
-				model: 'claude-haiku-4-5-20251001',
-				maxTokens: 1,
-				messages: array(
-					array(
-						'role'    => 'user',
-						'content' => 'Hi',
-					),
-				),
-			);
-			wp_send_json_success( __( 'API key is valid!', 'wptomedium' ) );
-		} catch ( \Anthropic\Core\Exceptions\AuthenticationException $e ) {
-			wp_send_json_error( __( 'Invalid API key.', 'wptomedium' ) );
-		} catch ( \Anthropic\Core\Exceptions\RateLimitException $e ) {
-			wp_send_json_error( __( 'Rate limit exceeded. Key may be valid — try again later.', 'wptomedium' ) );
-		} catch ( \Exception $e ) {
-			wp_send_json_error( sprintf(
-				/* translators: %s: error message from the API connection attempt */
-				__( 'Connection error: %s', 'wptomedium' ),
-				$e->getMessage()
-			) );
+		wp_send_json_success( array(
+			'message' => __( 'API key is valid!', 'wptomedium' ),
+			'models'  => $models,
+		) );
+	}
+
+	/**
+	 * AJAX handler to refresh the models list.
+	 */
+	public static function ajax_refresh_models() {
+		check_ajax_referer( 'wptomedium_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( __( 'Unauthorized.', 'wptomedium' ) );
 		}
+
+		$api_key = self::get_api_key();
+		if ( empty( $api_key ) ) {
+			wp_send_json_error( __( 'No API key configured.', 'wptomedium' ) );
+		}
+
+		delete_transient( self::TRANSIENT_MODELS );
+
+		$models = self::fetch_models_from_api( $api_key );
+
+		if ( is_wp_error( $models ) ) {
+			wp_send_json_error( $models->get_error_message() );
+		}
+
+		wp_send_json_success( array(
+			'message' => __( 'Models refreshed!', 'wptomedium' ),
+			'models'  => $models,
+		) );
 	}
 }

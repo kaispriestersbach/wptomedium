@@ -3,8 +3,9 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-// Plugin-Option löschen.
+// Plugin-Optionen und Transients löschen.
 delete_option( 'wptomedium_model_preference' );
+delete_transient( 'wptomedium_models_cache' );
 
 // Post Meta von allen Posts entfernen.
 global $wpdb;

@@ -104,6 +104,17 @@
 	font-weight: 600;
 }
 
+/* Refresh Models */
+.wptomedium-refresh-models {
+	vertical-align: middle;
+	margin-left: 8px !important;
+}
+
+.wptomedium-refresh-result {
+	vertical-align: middle;
+	font-weight: 600;
+}
+
 /* Responsive */
 @media screen and (max-width: 960px) {
 	.wptomedium-review-container,

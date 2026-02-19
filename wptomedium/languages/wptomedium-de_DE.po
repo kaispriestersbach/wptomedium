@@ -266,3 +266,27 @@ msgstr "Rate-Limit erreicht. Key möglicherweise gültig — bitte später erneu
 #: includes/class-wptomedium-settings.php
 msgid "Connection error: %s"
 msgstr "Verbindungsfehler: %s"
+
+#: includes/class-wptomedium-settings.php
+msgid "No Claude models found."
+msgstr "Keine Claude-Modelle gefunden."
+
+#: includes/class-wptomedium-settings.php
+msgid "Could not fetch models: %s"
+msgstr "Modelle konnten nicht abgerufen werden: %s"
+
+#: includes/class-wptomedium-settings.php
+msgid "No API key configured."
+msgstr "Kein API-Key konfiguriert."
+
+#: includes/class-wptomedium-settings.php
+msgid "Models refreshed!"
+msgstr "Modelle aktualisiert!"
+
+#: includes/class-wptomedium-settings.php
+msgid "Refresh Models"
+msgstr "Modelle aktualisieren"
+
+#: wptomedium.php
+msgid "Refreshing..."
+msgstr "Aktualisiere …"

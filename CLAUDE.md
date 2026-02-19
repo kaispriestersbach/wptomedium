@@ -46,7 +46,7 @@ wptomedium/
   composer.json
   vendor/                           # Gebündelte Dependencies
   includes/
-    class-wptomedium-settings.php   # Settings-Seite (AI-Model-Preference)
+    class-wptomedium-settings.php   # Settings-Seite (AI-Config, dynamische Modell-Liste)
     class-wptomedium-translator.php # Übersetzung + Gutenberg→Medium-HTML + Markdown
     class-wptomedium-workflow.php   # AJAX-Handler, Artikel-Liste, Review-Seite
   admin/
@@ -81,10 +81,12 @@ Post auswählen → "Übersetzen" (AJAX)
 - `wp_ajax_wptomedium_translate` — Übersetzung starten
 - `wp_ajax_wptomedium_save` — Bearbeitete Übersetzung speichern
 - `wp_ajax_wptomedium_copy_markdown` — HTML→Markdown serverseitig konvertieren
+- `wp_ajax_wptomedium_validate_key` — API-Key validieren + Modell-Liste abrufen (ein Call)
+- `wp_ajax_wptomedium_refresh_models` — Modell-Liste vom API neu laden
 
 ### Admin-Seiten (Menüpunkt "WPtoMedium")
 
-1. **Settings** (`wptomedium-settings`) — Link zu AI Credentials, Model-Preference
+1. **Settings** (`wptomedium-settings`) — AI Credentials, Model-Dropdown (dynamisch via API, gecacht als Transient 12h, Fallback auf 2 Standardmodelle)
 2. **Artikel-Auswahl** (`wptomedium-articles`) — `WP_List_Table`, Status-Spalte, Row-Actions
 3. **Review & Copy** (`wptomedium-review`) — Side-by-Side, TinyMCE mit eingeschränkter Toolbar (nur Medium-kompatible Tags)
 

@@ -96,8 +96,30 @@ function wptomedium_enqueue_admin_assets( $hook_suffix ) {
 		'markdownCopied'   => __( 'Markdown copied!', 'wptomedium' ),
 		'validating'       => __( 'Validating...', 'wptomedium' ),
 		'validateKey'      => __( 'Validate Key', 'wptomedium' ),
+		'refreshing'       => __( 'Refreshing...', 'wptomedium' ),
+		'refreshModels'    => __( 'Refresh Models', 'wptomedium' ),
 	) );
 }
+
+// Redirect zur Settings-Seite nach Aktivierung.
+register_activation_hook( __FILE__, function() {
+	add_option( 'wptomedium_activation_redirect', true );
+} );
+
+add_action( 'admin_init', function() {
+	if ( ! get_option( 'wptomedium_activation_redirect', false ) ) {
+		return;
+	}
+	delete_option( 'wptomedium_activation_redirect' );
+
+	// Kein Redirect bei Bulk-Aktivierung oder Netzwerk-Aktivierung.
+	if ( isset( $_GET['activate-multi'] ) || is_network_admin() ) {
+		return;
+	}
+
+	wp_safe_redirect( admin_url( 'admin.php?page=wptomedium-settings' ) );
+	exit;
+} );
 
 // Settings Action Link in Plugin-Zeile.
 add_filter( 'plugin_action_links_' . WPTOMEDIUM_PLUGIN_BASENAME, function( $links ) {
@@ -110,3 +132,4 @@ add_filter( 'plugin_action_links_' . WPTOMEDIUM_PLUGIN_BASENAME, function( $link
 // AJAX-Handler registrieren.
 WPtoMedium_Workflow::register_ajax_handlers();
 add_action( 'wp_ajax_wptomedium_validate_key', array( 'WPtoMedium_Settings', 'ajax_validate_key' ) );
+add_action( 'wp_ajax_wptomedium_refresh_models', array( 'WPtoMedium_Settings', 'ajax_refresh_models' ) );

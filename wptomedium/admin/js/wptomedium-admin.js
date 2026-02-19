@@ -128,6 +128,27 @@
 		} );
 	} );
 
+	/**
+	 * Update the model dropdown with new models.
+	 *
+	 * @param {Object} models Key-value pairs of model ID => display name.
+	 */
+	function updateModelDropdown( models ) {
+		var $select  = $( '#wptomedium-model-select' );
+		var previous = $select.val();
+
+		$select.empty();
+		$.each( models, function( id, name ) {
+			$select.append(
+				$( '<option>' ).val( id ).text( name )
+			);
+		} );
+
+		if ( $select.find( 'option[value="' + previous + '"]' ).length ) {
+			$select.val( previous );
+		}
+	}
+
 	// Validate API Key.
 	$( document ).on( 'click', '.wptomedium-validate-key', function() {
 		var $btn    = $( this );
@@ -144,7 +165,10 @@
 		} )
 		.done( function( response ) {
 			if ( response.success ) {
-				$result.text( response.data ).css( 'color', '#00a32a' ).fadeIn();
+				$result.text( response.data.message ).css( 'color', '#00a32a' ).fadeIn();
+				if ( response.data.models ) {
+					updateModelDropdown( response.data.models );
+				}
 			} else {
 				$result.text( response.data ).css( 'color', '#d63638' ).fadeIn();
 			}
@@ -154,6 +178,36 @@
 		} )
 		.always( function() {
 			$btn.prop( 'disabled', false ).text( wptomediumData.validateKey );
+		} );
+	} );
+
+	// Refresh Models.
+	$( document ).on( 'click', '.wptomedium-refresh-models', function() {
+		var $btn    = $( this );
+		var $result = $( '.wptomedium-refresh-result' );
+
+		$btn.prop( 'disabled', true ).text( wptomediumData.refreshing );
+		$result.hide();
+
+		$.post( wptomediumData.ajaxUrl, {
+			action: 'wptomedium_refresh_models',
+			nonce:  wptomediumData.nonce,
+		} )
+		.done( function( response ) {
+			if ( response.success ) {
+				$result.text( response.data.message ).css( 'color', '#00a32a' ).fadeIn();
+				if ( response.data.models ) {
+					updateModelDropdown( response.data.models );
+				}
+			} else {
+				$result.text( response.data ).css( 'color', '#d63638' ).fadeIn();
+			}
+		} )
+		.fail( function() {
+			$result.text( wptomediumData.requestFailed ).css( 'color', '#d63638' ).fadeIn();
+		} )
+		.always( function() {
+			$btn.prop( 'disabled', false ).text( wptomediumData.refreshModels );
 		} );
 	} );
 
