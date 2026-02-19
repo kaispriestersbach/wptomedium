@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-VERSION=$(grep -oP "Version:\s*\K[\d.]+" wptomedium/wptomedium.php)
+VERSION=$(sed -n 's/^.*Version:[[:space:]]*\([0-9.]*\).*/\1/p' wptomedium/wptomedium.php)
 ZIPNAME="wptomedium-${VERSION}.zip"
 
 echo "Building ${ZIPNAME}..."
