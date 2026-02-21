@@ -4,7 +4,7 @@ Tags: translation, medium, ai, clipboard, multilingual
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Stable tag: 1.2.2
+Stable tag: 1.2.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,10 @@ Features:
 4. Go to WPtoMedium > Articles to start translating
 
 == Changelog ==
+
+= 1.2.3 =
+* Translation input now renders full WordPress content pipeline, including shortcodes and dynamic blocks
+* Medium sanitization remains enforced after rendering and after AI response
 
 = 1.2.2 =
 * Fix for PHP 8.2 deprecation/header warnings in admin caused by hidden submenu registration

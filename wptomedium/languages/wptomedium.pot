@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPtoMedium 1.2.2\n"
+"Project-Id-Version: WPtoMedium 1.2.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/app\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-21T21:19:46+00:00\n"
+"POT-Creation-Date: 2026-02-21T21:30:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wptomedium\n"
@@ -100,7 +100,7 @@ msgid "No Claude models found."
 msgstr ""
 
 #: includes/class-wptomedium-settings.php:315
-#: includes/class-wptomedium-translator.php:476
+#: includes/class-wptomedium-translator.php:432
 msgid "Invalid API key."
 msgstr ""
 
@@ -168,7 +168,7 @@ msgid "Anthropic API key not configured. Please add your API key in Settings."
 msgstr ""
 
 #: includes/class-wptomedium-translator.php:137
-#: includes/class-wptomedium-translator.php:515
+#: includes/class-wptomedium-translator.php:471
 msgid "Translation failed. Please try again."
 msgstr ""
 
@@ -182,43 +182,43 @@ msgstr ""
 msgid "Translation complete."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:472
+#: includes/class-wptomedium-translator.php:428
 msgid "Invalid request. Please review your settings and try again."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:480
+#: includes/class-wptomedium-translator.php:436
 msgid "Permission denied for this API request."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:484
+#: includes/class-wptomedium-translator.php:440
 msgid "Requested API resource was not found."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:488
+#: includes/class-wptomedium-translator.php:444
 msgid "Request conflict. Please retry in a moment."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:492
+#: includes/class-wptomedium-translator.php:448
 msgid "Request could not be processed. Please adjust input and try again."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:496
+#: includes/class-wptomedium-translator.php:452
 msgid "Rate limit exceeded. Please try again later."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:500
+#: includes/class-wptomedium-translator.php:456
 msgid "API service is temporarily unavailable. Please try again later."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:504
+#: includes/class-wptomedium-translator.php:460
 msgid "API request timed out. Please try again."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:508
+#: includes/class-wptomedium-translator.php:464
 msgid "Could not connect to API. Please check your network and try again."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:512
+#: includes/class-wptomedium-translator.php:468
 msgid "API request failed. Please try again later."
 msgstr ""
 

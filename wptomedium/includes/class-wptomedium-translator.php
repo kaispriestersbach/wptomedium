@@ -188,7 +188,7 @@ class WPtoMedium_Translator {
 		}
 
 		// Content für Übersetzung rendern ohne the_content-Filterkette.
-		$content = $this->render_content_for_translation( $post->post_content );
+		$content = $this->render_content_for_translation( $post );
 
 		// Block-Kommentare entfernen.
 		$content = preg_replace( '/<!--\s*\/?wp:.*?-->/s', '', $content );
@@ -283,77 +283,33 @@ class WPtoMedium_Translator {
 	}
 
 	/**
-	 * Render post content for translation without executing full the_content filters.
+	 * Render post content for translation via standard content pipeline.
 	 *
-	 * @param string $post_content Raw post content.
+	 * This includes shortcode expansion and dynamic block rendering to ensure
+	 * the translated output reflects the final front-end content.
+	 *
+	 * @param WP_Post $post Post object.
 	 * @return string Rendered content.
 	 */
-	private function render_content_for_translation( $post_content ) {
-		$post_content = strip_shortcodes( (string) $post_content );
+	private function render_content_for_translation( WP_Post $post ) {
+		$previous_post = ( isset( $GLOBALS['post'] ) && $GLOBALS['post'] instanceof WP_Post )
+			? $GLOBALS['post']
+			: null;
 
-		if ( has_blocks( $post_content ) ) {
-			return $this->render_blocks_without_dynamic( parse_blocks( $post_content ) );
+		$GLOBALS['post'] = $post;
+		setup_postdata( $post );
+
+		$content = apply_filters( 'the_content', (string) $post->post_content );
+
+		if ( $previous_post instanceof WP_Post ) {
+			$GLOBALS['post'] = $previous_post;
+			setup_postdata( $previous_post );
+		} else {
+			unset( $GLOBALS['post'] );
+			wp_reset_postdata();
 		}
 
-		return (string) wpautop( $post_content );
-	}
-
-	/**
-	 * Render parsed blocks without executing dynamic block callbacks.
-	 *
-	 * @param array $blocks Parsed block array.
-	 * @return string Rendered HTML.
-	 */
-	private function render_blocks_without_dynamic( $blocks ) {
-		if ( ! is_array( $blocks ) ) {
-			return '';
-		}
-
-		$html = '';
-		foreach ( $blocks as $block ) {
-			if ( ! is_array( $block ) ) {
-				continue;
-			}
-			$html .= $this->render_single_block_without_dynamic( $block );
-		}
-
-		return $html;
-	}
-
-	/**
-	 * Render a single parsed block without executing dynamic callbacks.
-	 *
-	 * @param array $block Parsed block.
-	 * @return string Rendered HTML.
-	 */
-	private function render_single_block_without_dynamic( $block ) {
-		$result = '';
-
-		if ( isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
-			$inner_blocks = isset( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ? $block['innerBlocks'] : array();
-			$inner_index  = 0;
-
-			foreach ( $block['innerContent'] as $chunk ) {
-				if ( is_string( $chunk ) ) {
-					$result .= $chunk;
-				} elseif ( null === $chunk && isset( $inner_blocks[ $inner_index ] ) ) {
-					$result .= $this->render_single_block_without_dynamic( $inner_blocks[ $inner_index ] );
-					$inner_index++;
-				}
-			}
-
-			return $result;
-		}
-
-		if ( isset( $block['innerHTML'] ) && is_string( $block['innerHTML'] ) ) {
-			return $block['innerHTML'];
-		}
-
-		if ( isset( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
-			return $this->render_blocks_without_dynamic( $block['innerBlocks'] );
-		}
-
-		return $result;
+		return (string) $content;
 	}
 
 	/**

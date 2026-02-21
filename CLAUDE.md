@@ -112,7 +112,7 @@ Post auswählen → "Übersetzen" (AJAX)
 - `build_prompt( $title, $content )` — AI-Prompt
 - `parse_response( $response )` — Titel + Content extrahieren
 - `sanitize_medium_html( $html )` — script/style entfernen + `wp_kses()` mit Medium-Tag-Set
-- `render_content_for_translation( $post_content )` — Shortcodes strippen, Blöcke ohne dynamische Callbacks rendern
+- `render_content_for_translation( WP_Post $post )` — WordPress-Content-Pipeline (`the_content`) inkl. Shortcodes und dynamischer Blöcke rendern
 - `to_markdown( $html )` — HTML→Markdown
 
 ### Medium-kompatible Tags
@@ -122,14 +122,13 @@ Nicht unterstützt: `h3`-`h6`, `table`, `div`, `span`, CSS-Klassen, `iframe`
 
 ### Content-Pipeline (vor Übersetzung)
 
-1. `strip_shortcodes()` auf Raw Content
-2. `parse_blocks()` + nicht-dynamisches Rendern (`innerContent`/`innerHTML`) oder Fallback `wpautop()`
-3. Block-Kommentare entfernen (`<!-- wp:* -->`)
-4. `h3`-`h6` → `h2`
-5. `table` → Text-Absätze
-6. Galerien → einzelne `figure`-Elemente
-7. CSS-Klassen und `style`-Attribute entfernen
-8. `sanitize_medium_html()` als finaler Sanitizer
+1. `apply_filters( 'the_content', $post->post_content )` mit Post-Kontext (inkl. Shortcodes/dynamischer Blöcke)
+2. Block-Kommentare entfernen (`<!-- wp:* -->`)
+3. `h3`-`h6` → `h2`
+4. `table` → Text-Absätze
+5. Galerien → einzelne `figure`-Elemente
+6. CSS-Klassen und `style`-Attribute entfernen
+7. `sanitize_medium_html()` als finaler Sanitizer
 
 ## Coding Standards
 
