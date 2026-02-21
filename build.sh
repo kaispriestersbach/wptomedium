@@ -12,8 +12,11 @@ docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-pot \
 docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-mo /app/languages/
 
 # ZIP erstellen (nur wptomedium/ Ordner, ohne Dev-Dateien)
+rm -f "$ZIPNAME"
 zip -r "$ZIPNAME" wptomedium/ \
   -x "wptomedium/composer.json" \
-  -x "wptomedium/composer.lock"
+  -x "wptomedium/composer.lock" \
+  -x "*/.DS_Store" \
+  -x "__MACOSX/*"
 
 echo "Created ${ZIPNAME} ($(du -h "$ZIPNAME" | cut -f1))"

@@ -4,7 +4,19 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 // Plugin-Optionen und Transients löschen.
-delete_option( 'wptomedium_model_preference' );
+$option_keys = array(
+	'wptomedium_api_key',
+	'wptomedium_model',
+	'wptomedium_system_prompt',
+	'wptomedium_max_tokens',
+	'wptomedium_temperature',
+	'wptomedium_activation_redirect',
+);
+
+foreach ( $option_keys as $option_key ) {
+	delete_option( $option_key );
+}
+
 delete_transient( 'wptomedium_models_cache' );
 
 // Post Meta von allen Posts entfernen.

@@ -41,6 +41,28 @@ class WPtoMedium_Translator {
 	);
 
 	/**
+	 * Get the allowed HTML tags for Medium content.
+	 *
+	 * @return array Allowed HTML tags.
+	 */
+	public static function get_medium_tags() {
+		return self::$medium_tags;
+	}
+
+	/**
+	 * Sanitize raw HTML to the Medium-compatible safe subset.
+	 *
+	 * @param string $html Raw HTML content.
+	 * @return string Sanitized HTML.
+	 */
+	public static function sanitize_medium_html( $html ) {
+		$html = (string) $html;
+		$html = preg_replace( '/<(script|style)\b[^>]*>.*?<\/\1>/is', '', $html );
+
+		return wp_kses( $html, self::get_medium_tags() );
+	}
+
+	/**
 	 * Translate a post from German to English.
 	 *
 	 * @param int $post_id The post ID to translate.
@@ -98,26 +120,21 @@ class WPtoMedium_Translator {
 				),
 			);
 
-			$response_text = $message->content[0]->text;
-		} catch ( \Anthropic\Core\Exceptions\AuthenticationException $e ) {
+			$response_text = '';
+			if ( isset( $message->content[0] ) && isset( $message->content[0]->text ) ) {
+				$response_text = (string) $message->content[0]->text;
+			}
+		} catch ( \Anthropic\Core\Exceptions\APIException $e ) {
+			$this->log_exception( 'Anthropic API error', $e );
 			return array(
 				'success' => false,
-				'message' => __( 'Invalid API key.', 'wptomedium' ),
+				'message' => $this->get_api_error_message( $e ),
 			);
-		} catch ( \Anthropic\Core\Exceptions\RateLimitException $e ) {
+		} catch ( \Throwable $e ) {
+			$this->log_exception( 'Translation request failed', $e );
 			return array(
 				'success' => false,
-				'message' => __( 'Rate limit exceeded. Please try again later.', 'wptomedium' ),
-			);
-		} catch ( \Anthropic\Core\Exceptions\APIStatusException $e ) {
-			return array(
-				'success' => false,
-				'message' => __( 'API error: ', 'wptomedium' ) . $e->getMessage(),
-			);
-		} catch ( \Exception $e ) {
-			return array(
-				'success' => false,
-				'message' => __( 'Translation failed: ', 'wptomedium' ) . $e->getMessage(),
+				'message' => __( 'Translation failed. Please try again.', 'wptomedium' ),
 			);
 		}
 
@@ -130,7 +147,21 @@ class WPtoMedium_Translator {
 
 		// Response parsen und sanitizen.
 		$parsed             = $this->parse_response( $response_text );
+		if ( empty( $parsed['title'] ) || empty( $parsed['content'] ) ) {
+			return array(
+				'success' => false,
+				'message' => __( 'AI returned an empty response.', 'wptomedium' ),
+			);
+		}
+
 		$translated_content = $this->sanitize_for_medium( $parsed['content'] );
+		if ( empty( trim( wp_strip_all_tags( $translated_content ) ) ) ) {
+			return array(
+				'success' => false,
+				'message' => __( 'AI returned an empty response.', 'wptomedium' ),
+			);
+		}
+
 		$translated_title   = sanitize_text_field( $parsed['title'] );
 
 		// Post Meta speichern.
@@ -156,8 +187,8 @@ class WPtoMedium_Translator {
 			return '';
 		}
 
-		// Gutenberg rendern.
-		$content = apply_filters( 'the_content', $post->post_content );
+		// Content für Übersetzung rendern ohne the_content-Filterkette.
+		$content = $this->render_content_for_translation( $post->post_content );
 
 		// Block-Kommentare entfernen.
 		$content = preg_replace( '/<!--\s*\/?wp:.*?-->/s', '', $content );
@@ -166,18 +197,18 @@ class WPtoMedium_Translator {
 		$content = preg_replace( '/<h[3-6]([^>]*)>/', '<h2>', $content );
 		$content = preg_replace( '/<\/h[3-6]>/', '</h2>', $content );
 
-		// CSS-Klassen und style-Attribute entfernen.
-		$content = preg_replace( '/\s+class="[^"]*"/', '', $content );
-		$content = preg_replace( '/\s+style="[^"]*"/', '', $content );
-
 		// Tabellen → Text-Absätze.
 		$content = $this->convert_tables( $content );
 
 		// Galerien → einzelne figure-Elemente.
 		$content = $this->convert_galleries( $content );
 
+		// CSS-Klassen und style-Attribute entfernen.
+		$content = preg_replace( '/\s+class="[^"]*"/', '', $content );
+		$content = preg_replace( '/\s+style="[^"]*"/', '', $content );
+
 		// Finaler Sanitizer.
-		$content = wp_kses( $content, self::$medium_tags );
+		$content = wp_kses( $content, self::get_medium_tags() );
 
 		return $content;
 	}
@@ -224,12 +255,15 @@ class WPtoMedium_Translator {
 		$title   = '';
 		$content = '';
 
-		if ( preg_match( '/TITLE:\s*(.+?)(?:\n|CONTENT:)/s', $response, $title_match ) ) {
-			$title = trim( $title_match[1] );
-		}
+		if ( preg_match( '/^\s*CONTENT:\s*/im', $response, $content_match, PREG_OFFSET_CAPTURE ) ) {
+			$content_marker = $content_match[0];
+			$content_offset = $content_marker[1] + strlen( $content_marker[0] );
+			$content        = trim( substr( $response, $content_offset ) );
 
-		if ( preg_match( '/CONTENT:\s*(.+)/s', $response, $content_match ) ) {
-			$content = trim( $content_match[1] );
+			$before_content = substr( $response, 0, $content_marker[1] );
+			if ( preg_match( '/TITLE:\s*(.+)$/im', $before_content, $title_match ) ) {
+				$title = trim( $title_match[1] );
+			}
 		}
 
 		return array(
@@ -245,7 +279,81 @@ class WPtoMedium_Translator {
 	 * @return string Sanitized HTML.
 	 */
 	private function sanitize_for_medium( $html ) {
-		return wp_kses( $html, self::$medium_tags );
+		return self::sanitize_medium_html( $html );
+	}
+
+	/**
+	 * Render post content for translation without executing full the_content filters.
+	 *
+	 * @param string $post_content Raw post content.
+	 * @return string Rendered content.
+	 */
+	private function render_content_for_translation( $post_content ) {
+		$post_content = strip_shortcodes( (string) $post_content );
+
+		if ( has_blocks( $post_content ) ) {
+			return $this->render_blocks_without_dynamic( parse_blocks( $post_content ) );
+		}
+
+		return (string) wpautop( $post_content );
+	}
+
+	/**
+	 * Render parsed blocks without executing dynamic block callbacks.
+	 *
+	 * @param array $blocks Parsed block array.
+	 * @return string Rendered HTML.
+	 */
+	private function render_blocks_without_dynamic( $blocks ) {
+		if ( ! is_array( $blocks ) ) {
+			return '';
+		}
+
+		$html = '';
+		foreach ( $blocks as $block ) {
+			if ( ! is_array( $block ) ) {
+				continue;
+			}
+			$html .= $this->render_single_block_without_dynamic( $block );
+		}
+
+		return $html;
+	}
+
+	/**
+	 * Render a single parsed block without executing dynamic callbacks.
+	 *
+	 * @param array $block Parsed block.
+	 * @return string Rendered HTML.
+	 */
+	private function render_single_block_without_dynamic( $block ) {
+		$result = '';
+
+		if ( isset( $block['innerContent'] ) && is_array( $block['innerContent'] ) ) {
+			$inner_blocks = isset( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ? $block['innerBlocks'] : array();
+			$inner_index  = 0;
+
+			foreach ( $block['innerContent'] as $chunk ) {
+				if ( is_string( $chunk ) ) {
+					$result .= $chunk;
+				} elseif ( null === $chunk && isset( $inner_blocks[ $inner_index ] ) ) {
+					$result .= $this->render_single_block_without_dynamic( $inner_blocks[ $inner_index ] );
+					$inner_index++;
+				}
+			}
+
+			return $result;
+		}
+
+		if ( isset( $block['innerHTML'] ) && is_string( $block['innerHTML'] ) ) {
+			return $block['innerHTML'];
+		}
+
+		if ( isset( $block['innerBlocks'] ) && is_array( $block['innerBlocks'] ) ) {
+			return $this->render_blocks_without_dynamic( $block['innerBlocks'] );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -273,18 +381,138 @@ class WPtoMedium_Translator {
 	 * @return string HTML content with galleries replaced.
 	 */
 	private function convert_galleries( $html ) {
-		return preg_replace_callback(
-			'/<figure[^>]*class="[^"]*wp-block-gallery[^"]*"[^>]*>(.*?)<\/figure>/s',
-			function( $matches ) {
-				preg_match_all( '/<img[^>]+>/s', $matches[1], $images );
-				$result = '';
-				foreach ( $images[0] as $img ) {
-					$result .= '<figure>' . $img . '</figure>' . "\n";
-				}
-				return $result;
-			},
-			$html
+		if ( false === strpos( $html, 'wp-block-gallery' ) ) {
+			return $html;
+		}
+
+		$dom = new \DOMDocument();
+
+		$previous_errors = libxml_use_internal_errors( true );
+		$loaded          = $dom->loadHTML(
+			'<?xml encoding="utf-8" ?>' . $html,
+			LIBXML_NONET | LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
 		);
+		libxml_clear_errors();
+		libxml_use_internal_errors( $previous_errors );
+
+		if ( false === $loaded ) {
+			return $html;
+		}
+
+		$xpath     = new \DOMXPath( $dom );
+		$galleries = $xpath->query( '//*[contains(concat(" ", normalize-space(@class), " "), " wp-block-gallery ")]' );
+		if ( ! ( $galleries instanceof \DOMNodeList ) || 0 === $galleries->length ) {
+			return $html;
+		}
+
+		$gallery_nodes = array();
+		foreach ( $galleries as $gallery_node ) {
+			$gallery_nodes[] = $gallery_node;
+		}
+
+		foreach ( $gallery_nodes as $gallery_node ) {
+			if ( ! $gallery_node->parentNode ) {
+				continue;
+			}
+
+			$images = $gallery_node->getElementsByTagName( 'img' );
+			if ( 0 === $images->length ) {
+				continue;
+			}
+
+			$replacement = $dom->createDocumentFragment();
+			foreach ( $images as $image ) {
+				$figure = $dom->createElement( 'figure' );
+				$img    = $dom->createElement( 'img' );
+
+				if ( $image->hasAttribute( 'src' ) ) {
+					$img->setAttribute( 'src', $image->getAttribute( 'src' ) );
+				}
+				if ( $image->hasAttribute( 'alt' ) ) {
+					$img->setAttribute( 'alt', $image->getAttribute( 'alt' ) );
+				}
+
+				$figure->appendChild( $img );
+				$replacement->appendChild( $figure );
+				$replacement->appendChild( $dom->createTextNode( "\n" ) );
+			}
+
+			$gallery_node->parentNode->replaceChild( $replacement, $gallery_node );
+		}
+
+		$result = $dom->saveHTML();
+		if ( false === $result ) {
+			return $html;
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Log provider exceptions in debug mode without exposing details to users.
+	 *
+	 * @param string     $context   Log context.
+	 * @param \Throwable $exception Exception object.
+	 * @return void
+	 */
+	private function log_exception( $context, \Throwable $exception ) {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			error_log( sprintf( '[WPtoMedium] %s: %s', $context, $exception->getMessage() ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		}
+	}
+
+	/**
+	 * Map Anthropic API exceptions to user-safe, localized messages.
+	 *
+	 * @param \Throwable $exception Exception object.
+	 * @return string User-safe localized message.
+	 */
+	private function get_api_error_message( \Throwable $exception ) {
+		if ( $exception instanceof \Anthropic\Core\Exceptions\BadRequestException ) {
+			return __( 'Invalid request. Please review your settings and try again.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\AuthenticationException ) {
+			return __( 'Invalid API key.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\PermissionDeniedException ) {
+			return __( 'Permission denied for this API request.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\NotFoundException ) {
+			return __( 'Requested API resource was not found.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\ConflictException ) {
+			return __( 'Request conflict. Please retry in a moment.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\UnprocessableEntityException ) {
+			return __( 'Request could not be processed. Please adjust input and try again.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\RateLimitException ) {
+			return __( 'Rate limit exceeded. Please try again later.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\InternalServerException ) {
+			return __( 'API service is temporarily unavailable. Please try again later.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\APITimeoutException ) {
+			return __( 'API request timed out. Please try again.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\APIConnectionException ) {
+			return __( 'Could not connect to API. Please check your network and try again.', 'wptomedium' );
+		}
+
+		if ( $exception instanceof \Anthropic\Core\Exceptions\APIStatusException ) {
+			return __( 'API request failed. Please try again later.', 'wptomedium' );
+		}
+
+		return __( 'Translation failed. Please try again.', 'wptomedium' );
 	}
 
 	/**

@@ -47,7 +47,7 @@ class WPtoMedium_Workflow {
 
 		// Review-Seite (verstecktes Submenu — kein Navigations-Eintrag).
 		add_submenu_page(
-			null,
+			'',
 			__( 'Review Translation', 'wptomedium' ),
 			'',
 			'manage_options',
@@ -63,6 +63,7 @@ class WPtoMedium_Workflow {
 		add_action( 'wp_ajax_wptomedium_translate', array( __CLASS__, 'ajax_translate' ) );
 		add_action( 'wp_ajax_wptomedium_save', array( __CLASS__, 'ajax_save' ) );
 		add_action( 'wp_ajax_wptomedium_copy_markdown', array( __CLASS__, 'ajax_copy_markdown' ) );
+		add_action( 'wp_ajax_wptomedium_mark_copied', array( __CLASS__, 'ajax_mark_copied' ) );
 	}
 
 	/**
@@ -102,7 +103,6 @@ class WPtoMedium_Workflow {
 
 		$translation = get_post_meta( $post_id, '_wptomedium_translation', true );
 		$title       = get_post_meta( $post_id, '_wptomedium_translated_title', true );
-		$status      = get_post_meta( $post_id, '_wptomedium_status', true );
 
 		// Original-Content rendern.
 		$original_content = apply_filters( 'the_content', $post->post_content );
@@ -178,7 +178,7 @@ class WPtoMedium_Workflow {
 				</button>
 			</div>
 
-			<div class="wptomedium-toast" style="display:none;">
+			<div class="wptomedium-toast wptomedium-is-hidden">
 				<?php esc_html_e( 'Copied!', 'wptomedium' ); ?>
 			</div>
 		</div>
@@ -195,8 +195,8 @@ class WPtoMedium_Workflow {
 			wp_send_json_error( __( 'Permission denied.', 'wptomedium' ) );
 		}
 
-		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
-		if ( 0 === $post_id ) {
+		$post_id = self::get_valid_post_id_from_request();
+		if ( is_wp_error( $post_id ) ) {
 			wp_send_json_error( __( 'Invalid post ID.', 'wptomedium' ) );
 		}
 
@@ -228,13 +228,15 @@ class WPtoMedium_Workflow {
 			wp_send_json_error( __( 'Permission denied.', 'wptomedium' ) );
 		}
 
-		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
-		if ( 0 === $post_id ) {
+		$post_id = self::get_valid_post_id_from_request();
+		if ( is_wp_error( $post_id ) ) {
 			wp_send_json_error( __( 'Invalid post ID.', 'wptomedium' ) );
 		}
 
 		$title   = isset( $_POST['title'] ) ? sanitize_text_field( wp_unslash( $_POST['title'] ) ) : '';
-		$content = isset( $_POST['content'] ) ? wp_kses_post( wp_unslash( $_POST['content'] ) ) : '';
+		$content = isset( $_POST['content'] )
+			? WPtoMedium_Translator::sanitize_medium_html( wp_unslash( $_POST['content'] ) )
+			: '';
 
 		update_post_meta( $post_id, '_wptomedium_translated_title', $title );
 		update_post_meta( $post_id, '_wptomedium_translation', $content );
@@ -252,8 +254,8 @@ class WPtoMedium_Workflow {
 			wp_send_json_error( __( 'Permission denied.', 'wptomedium' ) );
 		}
 
-		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
-		if ( 0 === $post_id ) {
+		$post_id = self::get_valid_post_id_from_request();
+		if ( is_wp_error( $post_id ) ) {
 			wp_send_json_error( __( 'Invalid post ID.', 'wptomedium' ) );
 		}
 
@@ -263,12 +265,48 @@ class WPtoMedium_Workflow {
 		$translator = new WPtoMedium_Translator();
 		$markdown   = '# ' . $title . "\n\n" . $translator->to_markdown( $content );
 
-		// Status auf copied setzen.
-		update_post_meta( $post_id, '_wptomedium_status', 'copied' );
-
 		wp_send_json_success( array(
 			'markdown' => $markdown,
 		) );
+	}
+
+	/**
+	 * AJAX handler to mark translation as copied.
+	 */
+	public static function ajax_mark_copied() {
+		check_ajax_referer( 'wptomedium_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( __( 'Permission denied.', 'wptomedium' ) );
+		}
+
+		$post_id = self::get_valid_post_id_from_request();
+		if ( is_wp_error( $post_id ) ) {
+			wp_send_json_error( __( 'Invalid post ID.', 'wptomedium' ) );
+		}
+
+		update_post_meta( $post_id, '_wptomedium_status', 'copied' );
+
+		wp_send_json_success();
+	}
+
+	/**
+	 * Get and validate post ID from AJAX request payload.
+	 *
+	 * @return int|WP_Error Valid post ID or WP_Error.
+	 */
+	private static function get_valid_post_id_from_request() {
+		$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+		if ( 0 === $post_id ) {
+			return new WP_Error( 'invalid_post_id' );
+		}
+
+		$post = get_post( $post_id );
+		if ( ! ( $post instanceof WP_Post ) || 'post' !== $post->post_type ) {
+			return new WP_Error( 'invalid_post_id' );
+		}
+
+		return $post_id;
 	}
 }
 

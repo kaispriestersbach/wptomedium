@@ -11,6 +11,7 @@ WordPress-Plugin: Deutsche Blogartikel per KI ins Englische übersetzen, Side-by
 - **Medium-optimiert** — TinyMCE-Editor beschränkt auf Medium-kompatible Tags
 - **Copy-to-Clipboard** — HTML oder Markdown, bereit zum Einfügen in Medium
 - **Gutenberg-Pipeline** — Automatische Konvertierung von Blöcken zu Medium-HTML
+- **Security-Hardening** — API-Key wird nicht im Formular vorbefüllt; Shortcodes/dynamische Blöcke werden vor dem AI-Request nicht ausgeführt
 
 ## Warum kein direkter Medium-Publish?
 
@@ -33,6 +34,12 @@ Artikel auswählen → "Übersetzen" klicken
   → "Als HTML kopieren" oder "Als Markdown kopieren"
   → In Medium einfügen
 ```
+
+## Sicherheit
+
+- API-Key-Feld bleibt im UI leer (bestehender Key wird maskiert angezeigt)
+- Fehlermeldungen im UI enthalten keine rohen Provider-Exception-Details
+- Vor der Übersetzung werden keine Shortcodes oder dynamischen Block-Callbacks ausgeführt
 
 ## Voraussetzungen
 

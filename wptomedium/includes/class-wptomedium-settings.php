@@ -97,7 +97,7 @@ class WPtoMedium_Settings {
 			self::OPTION_API_KEY,
 			array(
 				'type'              => 'string',
-				'sanitize_callback' => 'sanitize_text_field',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_api_key' ),
 				'default'           => '',
 			)
 		);
@@ -218,33 +218,28 @@ class WPtoMedium_Settings {
 		<input
 			type="password"
 			name="<?php echo esc_attr( self::OPTION_API_KEY ); ?>"
-			value="<?php echo esc_attr( $api_key ); ?>"
+			value=""
 			class="regular-text"
-			autocomplete="off"
+			autocomplete="new-password"
 		/>
 		<button type="button" class="button wptomedium-validate-key">
 			<?php esc_html_e( 'Validate Key', 'wptomedium' ); ?>
 		</button>
-		<span class="wptomedium-validate-result" style="display:none; margin-left:10px;"></span>
+		<span class="wptomedium-validate-result wptomedium-inline-result wptomedium-is-hidden"></span>
 		<?php if ( ! empty( $masked ) ) : ?>
 			<p class="description">
-				<?php
-				printf(
-					/* translators: %s: masked API key showing only last 4 characters */
-					esc_html__( 'Current key: %s', 'wptomedium' ),
-					'<code>' . esc_html( $masked ) . '</code>'
-				);
-				?>
+				<?php esc_html_e( 'Current key:', 'wptomedium' ); ?>
+				<code><?php echo esc_html( $masked ); ?></code>
 			</p>
 		<?php endif; ?>
 		<p class="description">
-			<?php
-			printf(
-				/* translators: %s: link to Anthropic console */
-				esc_html__( 'Get your API key from %s', 'wptomedium' ),
-				'<a href="https://console.anthropic.com/settings/keys" target="_blank" rel="noopener">console.anthropic.com</a>'
-			);
-			?>
+			<?php esc_html_e( 'Leave this field empty to keep the currently stored key.', 'wptomedium' ); ?>
+		</p>
+		<p class="description">
+			<?php esc_html_e( 'Get your API key from', 'wptomedium' ); ?>
+			<a href="<?php echo esc_url( 'https://console.anthropic.com/settings/keys' ); ?>" target="_blank" rel="noopener">
+				<?php echo esc_html( 'console.anthropic.com' ); ?>
+			</a>
 		</p>
 		<?php
 	}
@@ -269,7 +264,7 @@ class WPtoMedium_Settings {
 		<button type="button" class="button wptomedium-refresh-models">
 			<?php esc_html_e( 'Refresh Models', 'wptomedium' ); ?>
 		</button>
-		<span class="wptomedium-refresh-result" style="display:none; margin-left:10px;"></span>
+		<span class="wptomedium-refresh-result wptomedium-inline-result wptomedium-is-hidden"></span>
 		<?php
 	}
 
@@ -321,11 +316,10 @@ class WPtoMedium_Settings {
 		} catch ( \Anthropic\Core\Exceptions\RateLimitException $e ) {
 			return new \WP_Error( 'rate_limit', __( 'Rate limit exceeded. Key may be valid — try again later.', 'wptomedium' ) );
 		} catch ( \Exception $e ) {
-			return new \WP_Error( 'api_error', sprintf(
-				/* translators: %s: error message from the API */
-				__( 'Could not fetch models: %s', 'wptomedium' ),
-				$e->getMessage()
-			) );
+			if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+				error_log( '[WPtoMedium] Model fetch failed: ' . $e->getMessage() ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			}
+			return new \WP_Error( 'api_error', __( 'Could not fetch models. Please try again later.', 'wptomedium' ) );
 		}
 	}
 
@@ -408,6 +402,21 @@ class WPtoMedium_Settings {
 	public static function sanitize_max_tokens( $value ) {
 		$value = absint( $value );
 		return max( 1024, min( 128000, $value ) );
+	}
+
+	/**
+	 * Sanitize API key and keep existing key on empty submissions.
+	 *
+	 * @param mixed $value Input value.
+	 * @return string Sanitized API key.
+	 */
+	public static function sanitize_api_key( $value ) {
+		$value = sanitize_text_field( (string) $value );
+		if ( '' === $value ) {
+			return (string) get_option( self::OPTION_API_KEY, '' );
+		}
+
+		return $value;
 	}
 
 	/**

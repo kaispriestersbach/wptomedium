@@ -96,7 +96,7 @@
 /* API Key Validation */
 .wptomedium-validate-key {
 	vertical-align: middle;
-	margin-left: 8px !important;
+	margin-left: 8px;
 }
 
 .wptomedium-validate-result {
@@ -107,7 +107,7 @@
 /* Refresh Models */
 .wptomedium-refresh-models {
 	vertical-align: middle;
-	margin-left: 8px !important;
+	margin-left: 8px;
 }
 
 .wptomedium-refresh-result {
@@ -120,6 +120,15 @@
 	width: 100%;
 	min-height: 200px;
 	font-family: monospace;
+}
+
+/* Utility */
+.wptomedium-inline-result {
+	margin-left: 10px;
+}
+
+.wptomedium-is-hidden {
+	display: none;
 }
 
 /* Responsive */

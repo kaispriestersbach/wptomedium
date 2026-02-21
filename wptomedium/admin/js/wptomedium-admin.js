@@ -14,6 +14,19 @@
 		}, 2000 );
 	}
 
+	/**
+	 * Persist copied status for a translated post.
+	 *
+	 * @param {number} postId Post ID.
+	 */
+	function markCopiedStatus( postId ) {
+		$.post( wptomediumData.ajaxUrl, {
+			action:  'wptomedium_mark_copied',
+			nonce:   wptomediumData.nonce,
+			post_id: postId,
+		} );
+	}
+
 	// Translate button on articles list.
 	$( document ).on( 'click', '.wptomedium-translate', function( e ) {
 		e.preventDefault();
@@ -95,6 +108,7 @@
 
 	// Copy as HTML.
 	$( document ).on( 'click', '.wptomedium-copy-html', function() {
+		var postId  = $( this ).data( 'post-id' );
 		var content = '';
 
 		if ( typeof tinyMCE !== 'undefined' && tinyMCE.get( 'wptomedium_translation_editor' ) ) {
@@ -104,7 +118,10 @@
 		}
 
 		navigator.clipboard.writeText( content ).then( function() {
+			markCopiedStatus( postId );
 			showToast( wptomediumData.htmlCopied );
+		} ).catch( function() {
+			alert( wptomediumData.requestFailed );
 		} );
 	} );
 
@@ -120,11 +137,17 @@
 		.done( function( response ) {
 			if ( response.success ) {
 				navigator.clipboard.writeText( response.data.markdown ).then( function() {
+					markCopiedStatus( postId );
 					showToast( wptomediumData.markdownCopied );
+				} ).catch( function() {
+					alert( wptomediumData.requestFailed );
 				} );
 			} else {
 				alert( response.data );
 			}
+		} )
+		.fail( function() {
+			alert( wptomediumData.requestFailed );
 		} );
 	} );
 

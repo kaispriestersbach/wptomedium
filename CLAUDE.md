@@ -76,7 +76,7 @@ wptomedium/
 Post auswählen → "Übersetzen" (AJAX)
   → Gutenberg→Medium-HTML Pipeline (prepare_content)
   → AI-Übersetzung (Anthropic PHP SDK)
-  → sanitize_for_medium (wp_kses)
+  → sanitize_medium_html (script/style entfernen + wp_kses)
   → Post Meta speichern
   → Review-Seite: Side-by-Side (Original read-only | Übersetzung editierbar via wp_editor)
   → Copy-to-Clipboard (HTML oder Markdown)
@@ -95,6 +95,7 @@ Post auswählen → "Übersetzen" (AJAX)
 - `wp_ajax_wptomedium_translate` — Übersetzung starten
 - `wp_ajax_wptomedium_save` — Bearbeitete Übersetzung speichern
 - `wp_ajax_wptomedium_copy_markdown` — HTML→Markdown serverseitig konvertieren
+- `wp_ajax_wptomedium_mark_copied` — Status nach erfolgreichem Clipboard-Copy auf `copied` setzen
 - `wp_ajax_wptomedium_validate_key` — API-Key validieren + Modell-Liste abrufen (ein Call)
 - `wp_ajax_wptomedium_refresh_models` — Modell-Liste vom API neu laden
 
@@ -110,7 +111,8 @@ Post auswählen → "Übersetzen" (AJAX)
 - `prepare_content( $post_id )` — Gutenberg→Medium-HTML Pipeline
 - `build_prompt( $title, $content )` — AI-Prompt
 - `parse_response( $response )` — Titel + Content extrahieren
-- `sanitize_for_medium( $html )` — `wp_kses()` mit Medium-Tag-Set
+- `sanitize_medium_html( $html )` — script/style entfernen + `wp_kses()` mit Medium-Tag-Set
+- `render_content_for_translation( $post_content )` — Shortcodes strippen, Blöcke ohne dynamische Callbacks rendern
 - `to_markdown( $html )` — HTML→Markdown
 
 ### Medium-kompatible Tags
@@ -120,13 +122,14 @@ Nicht unterstützt: `h3`-`h6`, `table`, `div`, `span`, CSS-Klassen, `iframe`
 
 ### Content-Pipeline (vor Übersetzung)
 
-1. `apply_filters( 'the_content' )` — Gutenberg rendert zu HTML
-2. Block-Kommentare entfernen (`<!-- wp:* -->`)
-3. `h3`-`h6` → `h2`
-4. CSS-Klassen und `style`-Attribute entfernen
+1. `strip_shortcodes()` auf Raw Content
+2. `parse_blocks()` + nicht-dynamisches Rendern (`innerContent`/`innerHTML`) oder Fallback `wpautop()`
+3. Block-Kommentare entfernen (`<!-- wp:* -->`)
+4. `h3`-`h6` → `h2`
 5. `table` → Text-Absätze
 6. Galerien → einzelne `figure`-Elemente
-7. `wp_kses()` als finaler Sanitizer
+7. CSS-Klassen und `style`-Attribute entfernen
+8. `sanitize_medium_html()` als finaler Sanitizer
 
 ## Coding Standards
 
@@ -157,7 +160,7 @@ Nicht unterstützt: `h3`-`h6`, `table`, `div`, `span`, CSS-Klassen, `iframe`
 
 - Text Domain: `wptomedium`, alle Strings Englisch mit `__()`/`esc_html__()`
 - Nonces + `current_user_can( 'manage_options' )` bei allen AJAX-Requests
-- Input: `sanitize_text_field()`, `wp_kses_post()`, `absint()`
+- Input: `sanitize_text_field()`, `absint()`, `WPtoMedium_Translator::sanitize_medium_html()`
 - Output: `esc_html()`, `esc_attr()`, `esc_url()`
 - Mit `WP_DEBUG` aktiv entwickeln
 
