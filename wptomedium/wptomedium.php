@@ -3,7 +3,7 @@
  * Plugin Name: WPtoMedium
  * Plugin URI:  https://github.com/kaispriestersbach/wptomedium
  * Description: Translate German WordPress posts to English via AI and copy to clipboard for Medium.
- * Version:     1.2.3
+ * Version:     1.2.4
  * Author:      Kai
  * Text Domain: wptomedium
  * Domain Path: /languages
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WPTOMEDIUM_VERSION', '1.2.3' );
+define( 'WPTOMEDIUM_VERSION', '1.2.4' );
 define( 'WPTOMEDIUM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WPTOMEDIUM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WPTOMEDIUM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
@@ -60,13 +60,23 @@ add_action( 'admin_enqueue_scripts', 'wptomedium_enqueue_admin_assets' );
  * @param string $hook_suffix The current admin page hook suffix.
  */
 function wptomedium_enqueue_admin_assets( $hook_suffix ) {
+	$page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+	$plugin_slugs = array(
+		'wptomedium-articles',
+		'wptomedium-settings',
+		'wptomedium-review',
+	);
+
+	$should_enqueue = in_array( $page, $plugin_slugs, true );
+
 	$plugin_pages = array(
 		'toplevel_page_wptomedium-articles',
 		'wptomedium_page_wptomedium-settings',
 		'wptomedium_page_wptomedium-review',
 	);
 
-	if ( ! in_array( $hook_suffix, $plugin_pages, true ) ) {
+	if ( ! $should_enqueue && ! in_array( $hook_suffix, $plugin_pages, true ) ) {
 		return;
 	}
 

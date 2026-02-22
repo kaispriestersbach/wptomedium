@@ -66,6 +66,12 @@ docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-pot /app /ap
 docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-mo /app/languages/
 ```
 
+## Changelog
+
+- **1.2.4**
+  - Fix: Settings-Buttons feuern auf manchen Live-Seiten wieder korrekt (Admin-JS wird robust nach Page-Slug geladen)
+  - Fix: AJAX/XHR von der Settings-Seite wird wieder zuverlässig ausgelöst
+
 ## Lizenz
 
 GPLv2 or later — siehe [LICENSE](LICENSE).
