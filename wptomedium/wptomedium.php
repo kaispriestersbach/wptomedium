@@ -3,7 +3,7 @@
  * Plugin Name: WPtoMedium
  * Plugin URI:  https://github.com/kaispriestersbach/wptomedium
  * Description: Translate German WordPress posts to English via AI and copy to clipboard for Medium.
- * Version:     1.2.7
+ * Version:     1.2.8
  * Author:      Kai
  * Text Domain: wptomedium
  * Domain Path: /languages
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WPTOMEDIUM_VERSION', '1.2.7' );
+define( 'WPTOMEDIUM_VERSION', '1.2.8' );
 define( 'WPTOMEDIUM_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'WPTOMEDIUM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'WPTOMEDIUM_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

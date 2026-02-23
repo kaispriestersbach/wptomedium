@@ -111,7 +111,7 @@ class WPtoMedium_Workflow {
 		$editor_content_style = implode(
 			'',
 			array(
-				'html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.65;color:#1d2327;overflow-y:hidden;}',
+				'html,body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;font-size:16px;line-height:1.65;color:#1d2327;overflow-y:hidden;}',
 				'body{padding:16px 18px;}',
 				'p,ul,ol,blockquote,figure,pre{margin:0 0 1.2em;}',
 				'h1,h2{font-family:inherit;line-height:1.3;font-weight:700;margin:1.4em 0 .6em;}',

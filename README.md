@@ -68,6 +68,10 @@ docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-mo /app/lang
 
 ## Changelog
 
+- **1.2.8**
+  - Fix: Review-Seite korrigiert nach TinyMCE-Konfigurationsfehler (Quote-Escaping im Inline-Editor-Style)
+  - Fix: Browserfehler `Unexpected identifier 'Segoe'` und Folgefehler `tinyMCEPreInit is not defined` behoben
+
 - **1.2.7**
   - Review: Editor startet standardmäßig in `Visuell`, Scrollen bleibt zwischen beiden Panels synchron
   - Review: Typografie und Abstände zwischen Original/Übersetzung wurden angeglichen, damit lange Artikel besser side-by-side lesbar sind
