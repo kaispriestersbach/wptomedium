@@ -316,15 +316,20 @@ class WPtoMedium_Translator {
 	}
 
 	/**
-	 * Render post content for translation via standard content pipeline.
+	 * Render post content for translation.
 	 *
-	 * This includes shortcode expansion and dynamic block rendering to ensure
-	 * the translated output reflects the final front-end content.
+	 * By default, this method uses raw post content without shortcode/dynamic block
+	 * execution to reduce accidental data exfiltration to external AI APIs.
+	 * Dynamic rendering can be explicitly enabled in plugin settings.
 	 *
 	 * @param WP_Post $post Post object.
 	 * @return string Rendered content.
 	 */
 	private function render_content_for_translation( WP_Post $post ) {
+		if ( ! WPtoMedium_Settings::should_render_dynamic_content() ) {
+			return strip_shortcodes( (string) $post->post_content );
+		}
+
 		$previous_post = ( isset( $GLOBALS['post'] ) && $GLOBALS['post'] instanceof WP_Post )
 			? $GLOBALS['post']
 			: null;

@@ -116,6 +116,7 @@ function wptomedium_enqueue_admin_assets( $hook_suffix ) {
 // Redirect zur Settings-Seite nach Aktivierung.
 register_activation_hook( __FILE__, function() {
 	add_option( 'wptomedium_activation_redirect', true );
+	add_option( WPtoMedium_Settings::OPTION_API_KEY, '', '', 'no' );
 } );
 
 add_action( 'admin_init', function() {

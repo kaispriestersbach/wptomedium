@@ -44,6 +44,20 @@ class WPtoMedium_Settings {
 	const OPTION_TEMPERATURE = 'wptomedium_temperature';
 
 	/**
+	 * Option name for dynamic content rendering before translation.
+	 *
+	 * @var string
+	 */
+	const OPTION_RENDER_DYNAMIC_CONTENT = 'wptomedium_render_dynamic_content';
+
+	/**
+	 * wp-config.php constant / environment variable for externally managed API key.
+	 *
+	 * @var string
+	 */
+	const EXTERNAL_API_KEY_NAME = 'WPTOMEDIUM_API_KEY';
+
+	/**
 	 * Default system prompt (editable part, without format instructions).
 	 *
 	 * @var string
@@ -92,6 +106,8 @@ class WPtoMedium_Settings {
 	 * Register settings with WordPress Settings API.
 	 */
 	public static function register_settings() {
+		self::harden_api_key_option_storage();
+
 		register_setting(
 			'wptomedium_settings',
 			self::OPTION_API_KEY,
@@ -166,6 +182,16 @@ class WPtoMedium_Settings {
 			)
 		);
 
+		register_setting(
+			'wptomedium_settings',
+			self::OPTION_RENDER_DYNAMIC_CONTENT,
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => array( __CLASS__, 'sanitize_dynamic_content_rendering' ),
+				'default'           => false,
+			)
+		);
+
 		add_settings_section(
 			'wptomedium_translation_section',
 			__( 'Translation Settings', 'wptomedium' ),
@@ -196,6 +222,14 @@ class WPtoMedium_Settings {
 			'wptomedium-settings',
 			'wptomedium_translation_section'
 		);
+
+		add_settings_field(
+			'wptomedium_dynamic_rendering_field',
+			__( 'Render Dynamic Content', 'wptomedium' ),
+			array( __CLASS__, 'render_dynamic_rendering_field' ),
+			'wptomedium-settings',
+			'wptomedium_translation_section'
+		);
 	}
 
 	/**
@@ -209,10 +243,12 @@ class WPtoMedium_Settings {
 	 * Render the API key input field.
 	 */
 	public static function render_api_key_field() {
-		$api_key = get_option( self::OPTION_API_KEY, '' );
-		$masked  = '';
-		if ( ! empty( $api_key ) ) {
-			$masked = str_repeat( '*', max( 0, strlen( $api_key ) - 4 ) ) . substr( $api_key, -4 );
+		$stored_api_key    = (string) get_option( self::OPTION_API_KEY, '' );
+		$external_api_key  = self::get_external_api_key();
+		$is_external       = '' !== $external_api_key;
+		$masked_stored_key = '';
+		if ( ! empty( $stored_api_key ) ) {
+			$masked_stored_key = str_repeat( '*', max( 0, strlen( $stored_api_key ) - 4 ) ) . substr( $stored_api_key, -4 );
 		}
 		?>
 		<input
@@ -221,20 +257,27 @@ class WPtoMedium_Settings {
 			value=""
 			class="regular-text"
 			autocomplete="new-password"
+			<?php disabled( $is_external ); ?>
 		/>
 		<button type="button" class="button wptomedium-validate-key">
 			<?php esc_html_e( 'Validate Key', 'wptomedium' ); ?>
 		</button>
 		<span class="wptomedium-validate-result wptomedium-inline-result wptomedium-is-hidden"></span>
-		<?php if ( ! empty( $masked ) ) : ?>
+		<?php if ( $is_external ) : ?>
+			<p class="description">
+				<?php esc_html_e( 'API key is managed externally via wp-config.php constant or environment variable WPTOMEDIUM_API_KEY.', 'wptomedium' ); ?>
+			</p>
+		<?php elseif ( ! empty( $masked_stored_key ) ) : ?>
 			<p class="description">
 				<?php esc_html_e( 'Current key:', 'wptomedium' ); ?>
-				<code><?php echo esc_html( $masked ); ?></code>
+				<code><?php echo esc_html( $masked_stored_key ); ?></code>
 			</p>
 		<?php endif; ?>
-		<p class="description">
-			<?php esc_html_e( 'Leave this field empty to keep the currently stored key.', 'wptomedium' ); ?>
-		</p>
+		<?php if ( ! $is_external ) : ?>
+			<p class="description">
+				<?php esc_html_e( 'Leave this field empty to keep the currently stored key.', 'wptomedium' ); ?>
+			</p>
+		<?php endif; ?>
 		<p class="description">
 			<?php esc_html_e( 'Get your API key from', 'wptomedium' ); ?>
 			<a href="<?php echo esc_url( 'https://console.anthropic.com/settings/keys' ); ?>" target="_blank" rel="noopener">
@@ -394,6 +437,28 @@ class WPtoMedium_Settings {
 	}
 
 	/**
+	 * Render the dynamic rendering option field.
+	 */
+	public static function render_dynamic_rendering_field() {
+		$enabled = self::should_render_dynamic_content();
+		?>
+		<label for="wptomedium-render-dynamic-content">
+			<input
+				type="checkbox"
+				id="wptomedium-render-dynamic-content"
+				name="<?php echo esc_attr( self::OPTION_RENDER_DYNAMIC_CONTENT ); ?>"
+				value="1"
+				<?php checked( $enabled ); ?>
+			/>
+			<?php esc_html_e( 'Allow shortcode and dynamic block rendering before sending content to the AI.', 'wptomedium' ); ?>
+		</label>
+		<p class="description">
+			<?php esc_html_e( 'Disabled by default for security. Enable only if you explicitly trust all rendered content.', 'wptomedium' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
 	 * Sanitize max tokens value, clamping to valid range.
 	 *
 	 * @param mixed $value Input value.
@@ -411,6 +476,10 @@ class WPtoMedium_Settings {
 	 * @return string Sanitized API key.
 	 */
 	public static function sanitize_api_key( $value ) {
+		if ( '' !== self::get_external_api_key() ) {
+			return (string) get_option( self::OPTION_API_KEY, '' );
+		}
+
 		$value = sanitize_text_field( (string) $value );
 		if ( '' === $value ) {
 			return (string) get_option( self::OPTION_API_KEY, '' );
@@ -428,6 +497,16 @@ class WPtoMedium_Settings {
 	public static function sanitize_temperature( $value ) {
 		$value = (float) $value;
 		return max( 0.0, min( 1.0, round( $value, 1 ) ) );
+	}
+
+	/**
+	 * Sanitize dynamic rendering setting.
+	 *
+	 * @param mixed $value Input value.
+	 * @return int 1 when enabled, 0 otherwise.
+	 */
+	public static function sanitize_dynamic_content_rendering( $value ) {
+		return ( 1 === absint( $value ) ) ? 1 : 0;
 	}
 
 	/**
@@ -635,7 +714,12 @@ class WPtoMedium_Settings {
 	 * @return string API key or empty string.
 	 */
 	public static function get_api_key() {
-		return get_option( self::OPTION_API_KEY, '' );
+		$external_api_key = self::get_external_api_key();
+		if ( '' !== $external_api_key ) {
+			return $external_api_key;
+		}
+
+		return (string) get_option( self::OPTION_API_KEY, '' );
 	}
 
 	/**
@@ -708,6 +792,15 @@ class WPtoMedium_Settings {
 	}
 
 	/**
+	 * Whether dynamic content rendering is enabled for translation input.
+	 *
+	 * @return bool True when enabled.
+	 */
+	public static function should_render_dynamic_content() {
+		return 1 === absint( get_option( self::OPTION_RENDER_DYNAMIC_CONTENT, 0 ) );
+	}
+
+	/**
 	 * AJAX handler to validate the Anthropic API key.
 	 *
 	 * Uses the models endpoint to validate the key and fetch available models in one call.
@@ -720,6 +813,10 @@ class WPtoMedium_Settings {
 		}
 
 		$api_key = isset( $_POST['api_key'] ) ? sanitize_text_field( wp_unslash( $_POST['api_key'] ) ) : '';
+		if ( empty( $api_key ) ) {
+			$api_key = self::get_api_key();
+		}
+
 		if ( empty( $api_key ) ) {
 			wp_send_json_error( __( 'Please enter an API key.', 'wptomedium' ) );
 		}
@@ -763,5 +860,49 @@ class WPtoMedium_Settings {
 			'message' => __( 'Models refreshed!', 'wptomedium' ),
 			'models'  => $models,
 		) );
+	}
+
+	/**
+	 * Resolve API key from wp-config.php constant or environment variable.
+	 *
+	 * @return string API key or empty string when not configured externally.
+	 */
+	private static function get_external_api_key() {
+		$external_key = '';
+
+		if ( defined( self::EXTERNAL_API_KEY_NAME ) ) {
+			$external_key = (string) constant( self::EXTERNAL_API_KEY_NAME );
+		}
+
+		if ( '' === trim( $external_key ) ) {
+			$from_env = getenv( self::EXTERNAL_API_KEY_NAME );
+			if ( false !== $from_env ) {
+				$external_key = (string) $from_env;
+			}
+		}
+
+		return trim( $external_key );
+	}
+
+	/**
+	 * Ensure API key option is not autoloaded.
+	 *
+	 * @return void
+	 */
+	private static function harden_api_key_option_storage() {
+		$current = get_option( self::OPTION_API_KEY, null );
+		if ( null === $current ) {
+			add_option( self::OPTION_API_KEY, '', '', 'no' );
+			return;
+		}
+
+		global $wpdb;
+		$wpdb->update(
+			$wpdb->options,
+			array( 'autoload' => 'no' ),
+			array( 'option_name' => self::OPTION_API_KEY ),
+			array( '%s' ),
+			array( '%s' )
+		);
 	}
 }

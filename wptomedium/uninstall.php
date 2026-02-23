@@ -10,6 +10,7 @@ $option_keys = array(
 	'wptomedium_system_prompt',
 	'wptomedium_max_tokens',
 	'wptomedium_temperature',
+	'wptomedium_render_dynamic_content',
 	'wptomedium_activation_redirect',
 );
 
