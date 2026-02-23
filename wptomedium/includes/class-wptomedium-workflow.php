@@ -111,14 +111,16 @@ class WPtoMedium_Workflow {
 		$editor_content_style = implode(
 			'',
 			array(
-				'html,body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Arial,sans-serif;font-size:16px;line-height:1.65;color:#1d2327;overflow-y:hidden;}',
-				'body{padding:16px 18px;}',
-				'p,ul,ol,blockquote,figure,pre{margin:0 0 1.2em;}',
-				'h1,h2{font-family:inherit;line-height:1.3;font-weight:700;margin:1.4em 0 .6em;}',
-				'h1{font-size:2em;}',
-				'h2{font-size:1.5em;}',
-				'img{max-width:100%;height:auto;}',
-				'figcaption{font-size:.9em;color:#50575e;}',
+				'html,body{margin:0;padding:0;}',
+				'body.wptomedium-editor-body{font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Arial,sans-serif;font-size:16px;line-height:1.65;color:#1d2327;overflow-y:hidden;padding:16px 18px;}',
+				'body.wptomedium-editor-body > :first-child{margin-top:0;}',
+				'body.wptomedium-editor-body > :last-child{margin-bottom:0;}',
+				'body.wptomedium-editor-body p,body.wptomedium-editor-body ul,body.wptomedium-editor-body ol,body.wptomedium-editor-body blockquote,body.wptomedium-editor-body figure,body.wptomedium-editor-body pre{margin:0 0 1.2em;}',
+				'body.wptomedium-editor-body ul,body.wptomedium-editor-body ol{padding-left:1.5em;}',
+				'body.wptomedium-editor-body li{margin:0 0 .45em;}',
+				'body.wptomedium-editor-body h1,body.wptomedium-editor-body h2,body.wptomedium-editor-body h3{font-family:inherit;font-size:1.85em;line-height:1.3;font-weight:700;margin:1.35em 0 .55em;}',
+				'body.wptomedium-editor-body img{display:block;max-width:100%;height:auto;margin:0 auto;}',
+				'body.wptomedium-editor-body figcaption{font-size:.9em;line-height:1.45;color:#50575e;margin-top:.4em;}',
 			)
 		);
 
@@ -131,6 +133,8 @@ class WPtoMedium_Workflow {
 				'toolbar1'      => 'bold,italic,link,blockquote,formatselect,bullist,numlist,code,hr,undo,redo',
 				'toolbar2'      => '',
 				'block_formats' => 'Paragraph=p;Heading 2=h2',
+				'content_css'   => false,
+				'body_class'    => 'wptomedium-editor-body',
 				'wp_autoresize_on' => true,
 				'content_style' => $editor_content_style,
 			),

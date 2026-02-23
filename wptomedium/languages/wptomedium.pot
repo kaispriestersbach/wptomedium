@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPtoMedium 1.2.8\n"
+"Project-Id-Version: WPtoMedium 1.2.9\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/app\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-23T11:26:27+00:00\n"
+"POT-Creation-Date: 2026-02-23T11:36:53+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wptomedium\n"
@@ -253,7 +253,7 @@ msgid "Settings"
 msgstr ""
 
 #: includes/class-wptomedium-workflow.php:51
-#: includes/class-wptomedium-workflow.php:143
+#: includes/class-wptomedium-workflow.php:147
 msgid "Review Translation"
 msgstr ""
 
@@ -261,103 +261,103 @@ msgstr ""
 msgid "WPtoMedium — Articles"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:147
+#: includes/class-wptomedium-workflow.php:151
 msgid "No translation available. Please translate the post first."
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:149
+#: includes/class-wptomedium-workflow.php:153
 msgid "Back to Articles"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:155
+#: includes/class-wptomedium-workflow.php:159
 msgid "Original Title"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:159
+#: includes/class-wptomedium-workflow.php:163
 msgid "Translated Title"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:170
+#: includes/class-wptomedium-workflow.php:174
 msgid "Original (German)"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:177
+#: includes/class-wptomedium-workflow.php:181
 msgid "Translation (English)"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:184
+#: includes/class-wptomedium-workflow.php:188
 msgid "Save Translation"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:187
+#: includes/class-wptomedium-workflow.php:191
 #: wptomedium.php:103
 msgid "Retranslate"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:190
+#: includes/class-wptomedium-workflow.php:194
 msgid "Copy as HTML"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:193
+#: includes/class-wptomedium-workflow.php:197
 msgid "Copy as Markdown"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:198
+#: includes/class-wptomedium-workflow.php:202
 msgid "Copied!"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:211
-#: includes/class-wptomedium-workflow.php:244
-#: includes/class-wptomedium-workflow.php:270
-#: includes/class-wptomedium-workflow.php:296
+#: includes/class-wptomedium-workflow.php:215
+#: includes/class-wptomedium-workflow.php:248
+#: includes/class-wptomedium-workflow.php:274
+#: includes/class-wptomedium-workflow.php:300
 msgid "Permission denied."
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:216
-#: includes/class-wptomedium-workflow.php:249
-#: includes/class-wptomedium-workflow.php:275
-#: includes/class-wptomedium-workflow.php:301
+#: includes/class-wptomedium-workflow.php:220
+#: includes/class-wptomedium-workflow.php:253
+#: includes/class-wptomedium-workflow.php:279
+#: includes/class-wptomedium-workflow.php:305
 msgid "Invalid post ID."
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:260
+#: includes/class-wptomedium-workflow.php:264
 msgid "Translation saved."
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:352
+#: includes/class-wptomedium-workflow.php:356
 msgid "Title"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:353
+#: includes/class-wptomedium-workflow.php:357
 msgid "Date"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:354
+#: includes/class-wptomedium-workflow.php:358
 msgid "Translation Status"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:403
+#: includes/class-wptomedium-workflow.php:407
 #: wptomedium.php:102
 msgid "Translate"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:412
+#: includes/class-wptomedium-workflow.php:416
 msgid "Review"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:442
+#: includes/class-wptomedium-workflow.php:446
 msgid "Not translated"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:443
+#: includes/class-wptomedium-workflow.php:447
 msgid "Pending"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:444
+#: includes/class-wptomedium-workflow.php:448
 msgid "Translated"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:445
+#: includes/class-wptomedium-workflow.php:449
 msgid "Copied"
 msgstr ""
 

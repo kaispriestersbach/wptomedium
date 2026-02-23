@@ -25,8 +25,16 @@
 	padding: 16px 18px;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
 	font-size: 16px;
-	line-height: 1.6;
+	line-height: 1.65;
 	color: #1d2327;
+}
+
+.wptomedium-content-preview > :first-child {
+	margin-top: 0;
+}
+
+.wptomedium-content-preview > :last-child {
+	margin-bottom: 0;
 }
 
 .wptomedium-content-preview p,
@@ -38,30 +46,37 @@
 	margin: 0 0 1.2em;
 }
 
+.wptomedium-content-preview ul,
+.wptomedium-content-preview ol {
+	padding-left: 1.5em;
+}
+
+.wptomedium-content-preview li {
+	margin: 0 0 0.45em;
+}
+
 .wptomedium-content-preview h1,
-.wptomedium-content-preview h2 {
-	margin: 1.4em 0 0.6em;
+.wptomedium-content-preview h2,
+.wptomedium-content-preview h3 {
+	margin: 1.35em 0 0.55em;
 	font-family: inherit;
 	font-weight: 700;
 	line-height: 1.3;
-}
-
-.wptomedium-content-preview h1 {
-	font-size: 2em;
-}
-
-.wptomedium-content-preview h2 {
-	font-size: 1.5em;
+	font-size: 1.85em;
 }
 
 .wptomedium-content-preview figcaption {
 	font-size: 0.9em;
+	line-height: 1.45;
 	color: #50575e;
+	margin-top: 0.4em;
 }
 
 .wptomedium-content-preview img {
+	display: block;
 	max-width: 100%;
 	height: auto;
+	margin: 0 auto;
 }
 
 #wptomedium_translation_editor,

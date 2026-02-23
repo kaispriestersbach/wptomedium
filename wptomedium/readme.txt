@@ -4,7 +4,7 @@ Tags: translation, medium, ai, clipboard, multilingual
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,10 @@ Features:
 4. Go to WPtoMedium > Articles to start translating
 
 == Changelog ==
+
+= 1.2.9 =
+* Matched TinyMCE translation pane typography/spacing to the original pane (font metrics, headings, lists, paragraph rhythm)
+* Unified review pane rendering rules for better long-form side-by-side visual alignment
 
 = 1.2.8 =
 * Fixed TinyMCE review page bootstrap regression caused by invalid inline editor config quoting

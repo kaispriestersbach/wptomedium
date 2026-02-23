@@ -68,6 +68,10 @@ docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-mo /app/lang
 
 ## Changelog
 
+- **1.2.9**
+  - Review: Exakte typografische Angleichung zwischen Original- und Übersetzungsansicht (Font-Metrik, Headings, Listen, Absatz-Rhythmus)
+  - Review: Einheitliches Rendering-Profil für beide Side-by-Side-Panels für stabilere visuelle Zeilenführung bei langen Artikeln
+
 - **1.2.8**
   - Fix: Review-Seite korrigiert nach TinyMCE-Konfigurationsfehler (Quote-Escaping im Inline-Editor-Style)
   - Fix: Browserfehler `Unexpected identifier 'Segoe'` und Folgefehler `tinyMCEPreInit is not defined` behoben
