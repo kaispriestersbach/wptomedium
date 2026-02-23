@@ -56,6 +56,14 @@ cd wptomedium/
 composer require anthropic-ai/sdk
 ```
 
+Sicherheitscheck auf bekannte Composer-CVEs:
+
+```bash
+bash ./security-check.sh
+```
+
+`build.sh` führt diesen Check automatisch vor dem ZIP-Build aus.
+
 Nach Änderungen an übersetzten Strings die i18n-Dateien aktualisieren:
 
 ```bash

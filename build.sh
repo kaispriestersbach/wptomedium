@@ -6,6 +6,9 @@ ZIPNAME="wptomedium-${VERSION}.zip"
 
 echo "Building ${ZIPNAME}..."
 
+# CVE-Check (bricht Build bei bekannten Security-Advisories ab)
+bash ./security-check.sh
+
 # i18n aktualisieren
 docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-pot \
   /app /app/languages/wptomedium.pot --domain=wptomedium --package-name="WPtoMedium"
