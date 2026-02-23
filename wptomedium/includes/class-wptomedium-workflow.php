@@ -101,11 +101,21 @@ class WPtoMedium_Workflow {
 			wp_die( esc_html__( 'Post not found.', 'wptomedium' ) );
 		}
 
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			wp_die( esc_html__( 'Permission denied.', 'wptomedium' ) );
+		}
+
 		$translation = get_post_meta( $post_id, '_wptomedium_translation', true );
 		$title       = get_post_meta( $post_id, '_wptomedium_translated_title', true );
 
-		// Original-Content rendern.
-		$original_content = apply_filters( 'the_content', $post->post_content );
+		// Original-Content über dieselbe Normalisierung wie für den Übersetzungs-Input rendern.
+		$translator       = new WPtoMedium_Translator();
+		$original_content = $translator->prepare_content( $post_id );
+
+		// Fallback auf Basis-Sanitizer, falls kein verwertbarer Inhalt bleibt.
+		if ( '' === trim( wp_strip_all_tags( $original_content ) ) ) {
+			$original_content = WPtoMedium_Translator::sanitize_medium_html( (string) $post->post_content );
+		}
 
 		// TinyMCE-Toolbar auf Medium-kompatible Tags einschränken.
 		$editor_content_style = implode(
@@ -217,6 +227,9 @@ class WPtoMedium_Workflow {
 
 		$post_id = self::get_valid_post_id_from_request();
 		if ( is_wp_error( $post_id ) ) {
+			if ( 'forbidden_post' === $post_id->get_error_code() ) {
+				wp_send_json_error( __( 'Permission denied.', 'wptomedium' ) );
+			}
 			wp_send_json_error( __( 'Invalid post ID.', 'wptomedium' ) );
 		}
 
@@ -250,6 +263,9 @@ class WPtoMedium_Workflow {
 
 		$post_id = self::get_valid_post_id_from_request();
 		if ( is_wp_error( $post_id ) ) {
+			if ( 'forbidden_post' === $post_id->get_error_code() ) {
+				wp_send_json_error( __( 'Permission denied.', 'wptomedium' ) );
+			}
 			wp_send_json_error( __( 'Invalid post ID.', 'wptomedium' ) );
 		}
 
@@ -276,6 +292,9 @@ class WPtoMedium_Workflow {
 
 		$post_id = self::get_valid_post_id_from_request();
 		if ( is_wp_error( $post_id ) ) {
+			if ( 'forbidden_post' === $post_id->get_error_code() ) {
+				wp_send_json_error( __( 'Permission denied.', 'wptomedium' ) );
+			}
 			wp_send_json_error( __( 'Invalid post ID.', 'wptomedium' ) );
 		}
 
@@ -302,6 +321,9 @@ class WPtoMedium_Workflow {
 
 		$post_id = self::get_valid_post_id_from_request();
 		if ( is_wp_error( $post_id ) ) {
+			if ( 'forbidden_post' === $post_id->get_error_code() ) {
+				wp_send_json_error( __( 'Permission denied.', 'wptomedium' ) );
+			}
 			wp_send_json_error( __( 'Invalid post ID.', 'wptomedium' ) );
 		}
 
@@ -324,6 +346,10 @@ class WPtoMedium_Workflow {
 		$post = get_post( $post_id );
 		if ( ! ( $post instanceof WP_Post ) || 'post' !== $post->post_type ) {
 			return new WP_Error( 'invalid_post_id' );
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return new WP_Error( 'forbidden_post' );
 		}
 
 		return $post_id;
