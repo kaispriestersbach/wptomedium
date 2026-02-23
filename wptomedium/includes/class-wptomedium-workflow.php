@@ -117,22 +117,8 @@ class WPtoMedium_Workflow {
 			$original_content = WPtoMedium_Translator::sanitize_medium_html( (string) $post->post_content );
 		}
 
-		// TinyMCE-Toolbar auf Medium-kompatible Tags einschränken.
-		$editor_content_style = implode(
-			'',
-			array(
-				'html,body{margin:0;padding:0;}',
-				'body.wptomedium-editor-body{font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Arial,sans-serif;font-size:16px;line-height:1.65;color:#1d2327;overflow-y:hidden;padding:16px 18px;}',
-				'body.wptomedium-editor-body > :first-child{margin-top:0;}',
-				'body.wptomedium-editor-body > :last-child{margin-bottom:0;}',
-				'body.wptomedium-editor-body p,body.wptomedium-editor-body ul,body.wptomedium-editor-body ol,body.wptomedium-editor-body blockquote,body.wptomedium-editor-body figure,body.wptomedium-editor-body pre{margin:0 0 1.2em;}',
-				'body.wptomedium-editor-body ul,body.wptomedium-editor-body ol{padding-left:1.5em;}',
-				'body.wptomedium-editor-body li{margin:0 0 .45em;}',
-				'body.wptomedium-editor-body h1,body.wptomedium-editor-body h2,body.wptomedium-editor-body h3{font-family:inherit;font-size:1.85em;line-height:1.3;font-weight:700;margin:1.35em 0 .55em;}',
-				'body.wptomedium-editor-body img{display:block;max-width:100%;height:auto;margin:0 auto;}',
-				'body.wptomedium-editor-body figcaption{font-size:.9em;line-height:1.45;color:#50575e;margin-top:.4em;}',
-			)
-		);
+		// Shared, minimal TinyMCE content baseline for both panels.
+		$editor_content_style = 'html,body{margin:0;padding:0;}body{padding:16px 18px;}';
 
 		$editor_settings = array(
 			'textarea_name' => 'wptomedium_translation',
@@ -144,13 +130,31 @@ class WPtoMedium_Workflow {
 				'toolbar2'      => '',
 				'block_formats' => 'Paragraph=p;Heading 2=h2',
 				'content_css'   => false,
-				'body_class'    => 'wptomedium-editor-body',
 				'wp_autoresize_on' => true,
 				'content_style' => $editor_content_style,
 			),
 			'quicktags'     => array(
 				'buttons' => 'strong,em,link,block,ul,ol,li,code,close',
 			),
+		);
+
+		$original_editor_settings = array(
+			'textarea_name' => 'wptomedium_original_preview',
+			'textarea_rows' => 20,
+			'media_buttons' => false,
+			'teeny'         => false,
+			'tinymce'       => array(
+				'toolbar1'         => '',
+				'toolbar2'         => '',
+				'menubar'          => false,
+				'statusbar'        => false,
+				'block_formats'    => 'Paragraph=p;Heading 2=h2',
+				'content_css'      => false,
+				'wp_autoresize_on' => true,
+				'readonly'         => 1,
+				'content_style'    => $editor_content_style,
+			),
+			'quicktags'     => false,
 		);
 		?>
 		<div class="wrap wptomedium-review-wrap">
@@ -182,9 +186,7 @@ class WPtoMedium_Workflow {
 			<div class="wptomedium-review-container">
 				<div class="wptomedium-review-panel wptomedium-panel-original">
 					<h3><?php esc_html_e( 'Original (German)', 'wptomedium' ); ?></h3>
-					<div class="wptomedium-content-preview">
-						<?php echo wp_kses_post( $original_content ); ?>
-					</div>
+					<?php wp_editor( $original_content, 'wptomedium_original_editor', $original_editor_settings ); ?>
 				</div>
 
 				<div class="wptomedium-review-panel wptomedium-panel-translation">

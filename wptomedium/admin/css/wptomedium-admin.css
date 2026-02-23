@@ -21,75 +21,22 @@
 	border-bottom: 1px solid #eee;
 }
 
-.wptomedium-content-preview {
-	padding: 16px 18px;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-	font-size: 16px;
-	line-height: 1.65;
-	font-weight: 400;
-	color: #1d2327;
-}
-
-.wptomedium-content-preview > :first-child {
-	margin-top: 0;
-}
-
-.wptomedium-content-preview > :last-child {
-	margin-bottom: 0;
-}
-
-.wptomedium-content-preview p,
-.wptomedium-content-preview ul,
-.wptomedium-content-preview ol,
-.wptomedium-content-preview blockquote,
-.wptomedium-content-preview figure,
-.wptomedium-content-preview pre {
-	margin: 0 0 1.2em;
-}
-
-.wptomedium-content-preview ul,
-.wptomedium-content-preview ol {
-	padding-left: 1.5em;
-}
-
-.wptomedium-content-preview li {
-	margin: 0 0 0.45em;
-}
-
-.wptomedium-content-preview h1,
-.wptomedium-content-preview h2,
-.wptomedium-content-preview h3 {
-	margin: 1.35em 0 0.55em;
-	font-family: inherit;
-	font-weight: 700;
-	line-height: 1.3;
-	font-size: 1.85em;
-}
-
-.wptomedium-content-preview figcaption {
-	font-size: 0.9em;
-	line-height: 1.45;
-	color: #50575e;
-	margin-top: 0.4em;
-}
-
-.wptomedium-content-preview img {
-	display: block;
-	max-width: 100%;
-	height: auto;
-	margin: 0 auto;
-}
-
-#wptomedium_translation_editor,
-#wp-wptomedium_translation_editor-wrap .mce-content-body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-	font-size: 16px;
-	line-height: 1.65;
-	font-weight: 400;
-}
-
-#wp-wptomedium_translation_editor-wrap .mce-edit-area iframe {
+#wp-wptomedium_translation_editor-wrap .mce-edit-area iframe,
+#wp-wptomedium_original_editor-wrap .mce-edit-area iframe {
 	min-height: 420px;
+}
+
+.wptomedium-panel-original .wp-editor-tools .wp-editor-tabs,
+.wptomedium-panel-original .wp-editor-tools .mce-toolbar-grp,
+.wptomedium-panel-original .quicktags-toolbar,
+.wptomedium-panel-original .mce-statusbar {
+	display: none;
+}
+
+.wptomedium-panel-original .wp-editor-container,
+.wptomedium-panel-original .mce-top-part::before,
+.wptomedium-panel-original .mce-edit-area {
+	border: 0;
 }
 
 /* Title Row */

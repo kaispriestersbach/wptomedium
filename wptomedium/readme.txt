@@ -4,7 +4,7 @@ Tags: translation, medium, ai, clipboard, multilingual
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Stable tag: 1.2.10
+Stable tag: 1.2.11
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,11 @@ Features:
 4. Go to WPtoMedium > Articles to start translating
 
 == Changelog ==
+
+= 1.2.11 =
+* Side-by-side review now renders both panels via TinyMCE (left panel is read-only) for consistent visual rendering
+* Removed heavy typography/CSS override hacks in review mode and switched to a minimal shared TinyMCE baseline
+* Kept synchronized scrolling and visual-mode behavior across both panes
 
 = 1.2.10 =
 * Side-by-side review now uses the same Medium-normalized HTML pipeline for Original and Translation to reduce visual drift

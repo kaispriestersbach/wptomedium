@@ -243,10 +243,14 @@
 	 * Force Visual mode and keep side-by-side panes scroll-synchronized.
 	 */
 	function initReviewPageComparison() {
-		var editorId = 'wptomedium_translation_editor';
+		var translationEditorId = 'wptomedium_translation_editor';
+		var originalEditorId = 'wptomedium_original_editor';
+		var editorIds = [ translationEditorId, originalEditorId ];
 		var $review  = $( '.wptomedium-review-wrap' );
 		var leftPane = document.querySelector( '.wptomedium-panel-original' );
 		var rightPane = document.querySelector( '.wptomedium-panel-translation' );
+		var pollAttempts = 0;
+		var editorPoll = null;
 
 		if ( ! $review.length || ! leftPane || ! rightPane ) {
 			return;
@@ -254,12 +258,12 @@
 
 		var isSyncing = false;
 
-		function getEditorWrap() {
+		function getEditorWrap( editorId ) {
 			return document.getElementById( 'wp-' + editorId + '-wrap' );
 		}
 
-		function ensureVisualMode() {
-			var editorWrap = getEditorWrap();
+		function ensureVisualMode( editorId ) {
+			var editorWrap = getEditorWrap( editorId );
 			if ( ! editorWrap || editorWrap.classList.contains( 'tmce-active' ) ) {
 				return;
 			}
@@ -269,7 +273,7 @@
 			}
 		}
 
-		function autoResizeEditor() {
+		function autoResizeEditor( editorId ) {
 			if ( 'undefined' === typeof tinyMCE || ! tinyMCE ) {
 				return;
 			}
@@ -281,6 +285,93 @@
 
 			editor.execCommand( 'mceAutoResize' );
 			editor.execCommand( 'mceAutoResize' );
+		}
+
+		function scheduleEditorSync( editorId ) {
+			window.setTimeout( function() {
+				ensureVisualMode( editorId );
+				autoResizeEditor( editorId );
+			}, 120 );
+
+			window.setTimeout( function() {
+				ensureVisualMode( editorId );
+				autoResizeEditor( editorId );
+			}, 360 );
+
+			window.setTimeout( function() {
+				ensureVisualMode( editorId );
+				autoResizeEditor( editorId );
+			}, 900 );
+		}
+
+		function scheduleAllEditors() {
+			var i;
+			for ( i = 0; i < editorIds.length; i++ ) {
+				scheduleEditorSync( editorIds[ i ] );
+			}
+		}
+
+		function bindEditorLifecycle( editor ) {
+			if ( ! editor || editor.wptomediumLifecycleBound ) {
+				return;
+			}
+
+			editor.wptomediumLifecycleBound = true;
+
+			editor.on( 'init', function() {
+				scheduleEditorSync( editor.id );
+			} );
+
+			editor.on( 'SetContent', function() {
+				window.setTimeout( function() {
+					autoResizeEditor( editor.id );
+				}, 40 );
+			} );
+
+			editor.on( 'NodeChange', function() {
+				window.setTimeout( function() {
+					autoResizeEditor( editor.id );
+				}, 40 );
+			} );
+		}
+
+		function bindExistingEditors() {
+			var i;
+			var editor;
+
+			if ( 'undefined' === typeof tinyMCE || ! tinyMCE ) {
+				return;
+			}
+
+			for ( i = 0; i < editorIds.length; i++ ) {
+				editor = tinyMCE.get( editorIds[ i ] );
+				if ( editor ) {
+					bindEditorLifecycle( editor );
+				}
+			}
+		}
+
+		function startEditorPolling() {
+			if ( editorPoll ) {
+				return;
+			}
+
+			editorPoll = window.setInterval( function() {
+				var translationReady;
+				var originalReady;
+
+				pollAttempts++;
+				bindExistingEditors();
+				scheduleAllEditors();
+
+				translationReady = ( 'undefined' !== typeof tinyMCE && tinyMCE && tinyMCE.get( translationEditorId ) );
+				originalReady = ( 'undefined' !== typeof tinyMCE && tinyMCE && tinyMCE.get( originalEditorId ) );
+
+				if ( pollAttempts >= 40 || ( translationReady && originalReady && pollAttempts > 8 ) ) {
+					window.clearInterval( editorPoll );
+					editorPoll = null;
+				}
+			}, 250 );
 		}
 
 		function syncScrollPosition( source, target ) {
@@ -316,32 +407,35 @@
 			syncScrollPosition( rightPane, leftPane );
 		}
 
-		ensureVisualMode();
-		window.setTimeout( autoResizeEditor, 120 );
-		window.setTimeout( ensureVisualMode, 120 );
-		window.setTimeout( autoResizeEditor, 320 );
-		window.setTimeout( ensureVisualMode, 600 );
-		window.setTimeout( autoResizeEditor, 800 );
+		scheduleAllEditors();
+		startEditorPolling();
+		bindExistingEditors();
 
 		leftPane.addEventListener( 'scroll', onLeftScroll );
 		rightPane.addEventListener( 'scroll', onRightScroll );
 
-		$( document ).on( 'click', '#wp-' + editorId + '-wrap .wp-switch-editor', function() {
-			window.setTimeout( autoResizeEditor, 160 );
-			window.setTimeout( autoResizeEditor, 400 );
+		$( document ).on( 'click', '#wp-' + translationEditorId + '-wrap .wp-switch-editor, #wp-' + originalEditorId + '-wrap .wp-switch-editor', function() {
+			var $wrap = $( this ).closest( '.wp-editor-wrap' );
+			var wrapId = $wrap.attr( 'id' );
+			var editorId = '';
+
+			if ( wrapId ) {
+				editorId = wrapId.replace( /^wp-/, '' ).replace( /-wrap$/, '' );
+			}
+
+			if ( editorId ) {
+				scheduleEditorSync( editorId );
+				return;
+			}
+
+			scheduleAllEditors();
 		} );
 
 		if ( 'undefined' !== typeof tinymce && tinymce ) {
 			tinymce.on( 'AddEditor', function( event ) {
-				if ( event.editor && editorId === event.editor.id ) {
-					event.editor.on( 'init', function() {
-						ensureVisualMode();
-						window.setTimeout( autoResizeEditor, 120 );
-					} );
-
-					event.editor.on( 'SetContent', function() {
-						window.setTimeout( autoResizeEditor, 40 );
-					} );
+				if ( event.editor && -1 !== editorIds.indexOf( event.editor.id ) ) {
+					bindEditorLifecycle( event.editor );
+					scheduleEditorSync( event.editor.id );
 				}
 			} );
 		}
