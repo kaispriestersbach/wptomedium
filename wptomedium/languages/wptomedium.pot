@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: WPtoMedium 1.2.9\n"
+"Project-Id-Version: WPtoMedium 1.2.10\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/app\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-23T11:44:36+00:00\n"
+"POT-Creation-Date: 2026-02-23T11:49:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: wptomedium\n"
@@ -36,136 +36,152 @@ msgstr ""
 msgid "Kai"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:117
+#: includes/class-wptomedium-settings.php:133
 msgid "AI Configuration"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:124
+#: includes/class-wptomedium-settings.php:140
 msgid "Anthropic API Key"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:132
+#: includes/class-wptomedium-settings.php:148
 msgid "Claude Model"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:171
+#: includes/class-wptomedium-settings.php:197
 msgid "Translation Settings"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:178
+#: includes/class-wptomedium-settings.php:204
 msgid "System Prompt"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:186
+#: includes/class-wptomedium-settings.php:212
 msgid "Max Tokens"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:194
+#: includes/class-wptomedium-settings.php:220
 msgid "Temperature"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:205
+#: includes/class-wptomedium-settings.php:228
+msgid "Render Dynamic Content"
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:239
 msgid "Enter your Anthropic API key and select a Claude model for translations."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:226
+#: includes/class-wptomedium-settings.php:263
 #: wptomedium.php:108
 msgid "Validate Key"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:231
+#: includes/class-wptomedium-settings.php:268
+msgid "API key is managed externally via wp-config.php constant or environment variable WPTOMEDIUM_API_KEY."
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:272
 msgid "Current key:"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:236
+#: includes/class-wptomedium-settings.php:278
 msgid "Leave this field empty to keep the currently stored key."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:239
+#: includes/class-wptomedium-settings.php:282
 msgid "Get your API key from"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:265
+#: includes/class-wptomedium-settings.php:308
 #: wptomedium.php:110
 msgid "Refresh Models"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:292
+#: includes/class-wptomedium-settings.php:335
 #: includes/class-wptomedium-translator.php:102
 msgid "Anthropic SDK not available."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:308
+#: includes/class-wptomedium-settings.php:351
 msgid "No Claude models found."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:315
-#: includes/class-wptomedium-translator.php:475
+#: includes/class-wptomedium-settings.php:358
+#: includes/class-wptomedium-translator.php:480
 msgid "Invalid API key."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:317
+#: includes/class-wptomedium-settings.php:360
 msgid "Rate limit exceeded. Key may be valid — try again later."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:322
+#: includes/class-wptomedium-settings.php:365
 msgid "Could not fetch models. Please try again later."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:330
+#: includes/class-wptomedium-settings.php:373
 msgid "Configure how the AI translates your posts."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:346
+#: includes/class-wptomedium-settings.php:389
 msgid "This prompt tells the AI how to translate. The output format instructions are added automatically."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:349
+#: includes/class-wptomedium-settings.php:392
 #: wptomedium.php:112
 msgid "Restore Default"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:370
+#: includes/class-wptomedium-settings.php:413
 msgid "Maximum number of tokens in the AI response (1024–128000)."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:391
+#: includes/class-wptomedium-settings.php:434
 msgid "Controls randomness of the translation (0 = deterministic, 1 = creative)."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:463
+#: includes/class-wptomedium-settings.php:453
+msgid "Allow shortcode and dynamic block rendering before sending content to the AI."
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:456
+msgid "Disabled by default for security. Enable only if you explicitly trust all rendered content."
+msgstr ""
+
+#: includes/class-wptomedium-settings.php:542
 #: wptomedium.php:104
 msgid "Translation request failed."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:464
+#: includes/class-wptomedium-settings.php:543
 #: wptomedium.php:107
 msgid "Validating..."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:465
+#: includes/class-wptomedium-settings.php:544
 #: wptomedium.php:109
 msgid "Refreshing..."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:719
-#: includes/class-wptomedium-settings.php:746
+#: includes/class-wptomedium-settings.php:812
+#: includes/class-wptomedium-settings.php:843
 msgid "Unauthorized."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:724
+#: includes/class-wptomedium-settings.php:821
 msgid "Please enter an API key."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:734
+#: includes/class-wptomedium-settings.php:831
 msgid "API key is valid!"
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:751
+#: includes/class-wptomedium-settings.php:848
 msgid "No API key configured."
 msgstr ""
 
-#: includes/class-wptomedium-settings.php:763
+#: includes/class-wptomedium-settings.php:860
 msgid "Models refreshed!"
 msgstr ""
 
@@ -183,7 +199,7 @@ msgid "Anthropic API key not configured. Please add your API key in Settings."
 msgstr ""
 
 #: includes/class-wptomedium-translator.php:145
-#: includes/class-wptomedium-translator.php:514
+#: includes/class-wptomedium-translator.php:519
 msgid "Translation failed. Please try again."
 msgstr ""
 
@@ -197,47 +213,47 @@ msgstr ""
 msgid "Translation complete."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:468
+#: includes/class-wptomedium-translator.php:473
 msgid "Insufficient Anthropic credits. Please top up your plan in Plans & Billing and try again."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:471
+#: includes/class-wptomedium-translator.php:476
 msgid "Invalid request. Please review your settings and try again."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:479
+#: includes/class-wptomedium-translator.php:484
 msgid "Permission denied for this API request."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:483
+#: includes/class-wptomedium-translator.php:488
 msgid "Requested API resource was not found."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:487
+#: includes/class-wptomedium-translator.php:492
 msgid "Request conflict. Please retry in a moment."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:491
+#: includes/class-wptomedium-translator.php:496
 msgid "Request could not be processed. Please adjust input and try again."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:495
+#: includes/class-wptomedium-translator.php:500
 msgid "Rate limit exceeded. Please try again later."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:499
+#: includes/class-wptomedium-translator.php:504
 msgid "API service is temporarily unavailable. Please try again later."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:503
+#: includes/class-wptomedium-translator.php:508
 msgid "API request timed out. Please try again."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:507
+#: includes/class-wptomedium-translator.php:512
 msgid "Could not connect to API. Please check your network and try again."
 msgstr ""
 
-#: includes/class-wptomedium-translator.php:511
+#: includes/class-wptomedium-translator.php:516
 msgid "API request failed. Please try again later."
 msgstr ""
 
@@ -248,12 +264,12 @@ msgstr ""
 
 #: includes/class-wptomedium-workflow.php:41
 #: includes/class-wptomedium-workflow.php:42
-#: wptomedium.php:139
+#: wptomedium.php:140
 msgid "Settings"
 msgstr ""
 
 #: includes/class-wptomedium-workflow.php:51
-#: includes/class-wptomedium-workflow.php:154
+#: includes/class-wptomedium-workflow.php:157
 msgid "Review Translation"
 msgstr ""
 
@@ -261,103 +277,108 @@ msgstr ""
 msgid "WPtoMedium — Articles"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:158
+#: includes/class-wptomedium-workflow.php:105
+#: includes/class-wptomedium-workflow.php:225
+#: includes/class-wptomedium-workflow.php:231
+#: includes/class-wptomedium-workflow.php:261
+#: includes/class-wptomedium-workflow.php:267
+#: includes/class-wptomedium-workflow.php:290
+#: includes/class-wptomedium-workflow.php:296
+#: includes/class-wptomedium-workflow.php:319
+#: includes/class-wptomedium-workflow.php:325
+msgid "Permission denied."
+msgstr ""
+
+#: includes/class-wptomedium-workflow.php:161
 msgid "No translation available. Please translate the post first."
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:160
+#: includes/class-wptomedium-workflow.php:163
 msgid "Back to Articles"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:166
+#: includes/class-wptomedium-workflow.php:169
 msgid "Original Title"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:170
+#: includes/class-wptomedium-workflow.php:173
 msgid "Translated Title"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:181
+#: includes/class-wptomedium-workflow.php:184
 msgid "Original (German)"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:188
+#: includes/class-wptomedium-workflow.php:191
 msgid "Translation (English)"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:195
+#: includes/class-wptomedium-workflow.php:198
 msgid "Save Translation"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:198
+#: includes/class-wptomedium-workflow.php:201
 #: wptomedium.php:103
 msgid "Retranslate"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:201
+#: includes/class-wptomedium-workflow.php:204
 msgid "Copy as HTML"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:204
+#: includes/class-wptomedium-workflow.php:207
 msgid "Copy as Markdown"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:209
+#: includes/class-wptomedium-workflow.php:212
 msgid "Copied!"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:222
-#: includes/class-wptomedium-workflow.php:255
-#: includes/class-wptomedium-workflow.php:281
-#: includes/class-wptomedium-workflow.php:307
-msgid "Permission denied."
-msgstr ""
-
-#: includes/class-wptomedium-workflow.php:227
-#: includes/class-wptomedium-workflow.php:260
-#: includes/class-wptomedium-workflow.php:286
-#: includes/class-wptomedium-workflow.php:312
+#: includes/class-wptomedium-workflow.php:233
+#: includes/class-wptomedium-workflow.php:269
+#: includes/class-wptomedium-workflow.php:298
+#: includes/class-wptomedium-workflow.php:327
 msgid "Invalid post ID."
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:271
+#: includes/class-wptomedium-workflow.php:280
 msgid "Translation saved."
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:363
+#: includes/class-wptomedium-workflow.php:382
 msgid "Title"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:364
+#: includes/class-wptomedium-workflow.php:383
 msgid "Date"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:365
+#: includes/class-wptomedium-workflow.php:384
 msgid "Translation Status"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:414
+#: includes/class-wptomedium-workflow.php:433
 #: wptomedium.php:102
 msgid "Translate"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:423
+#: includes/class-wptomedium-workflow.php:442
 msgid "Review"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:453
+#: includes/class-wptomedium-workflow.php:472
 msgid "Not translated"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:454
+#: includes/class-wptomedium-workflow.php:473
 msgid "Pending"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:455
+#: includes/class-wptomedium-workflow.php:474
 msgid "Translated"
 msgstr ""
 
-#: includes/class-wptomedium-workflow.php:456
+#: includes/class-wptomedium-workflow.php:475
 msgid "Copied"
 msgstr ""
 

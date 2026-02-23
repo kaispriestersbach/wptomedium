@@ -4,7 +4,7 @@ Tags: translation, medium, ai, clipboard, multilingual
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Stable tag: 1.2.9
+Stable tag: 1.2.10
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,13 @@ Features:
 4. Go to WPtoMedium > Articles to start translating
 
 == Changelog ==
+
+= 1.2.10 =
+* Side-by-side review now uses the same Medium-normalized HTML pipeline for Original and Translation to reduce visual drift
+* Improved side-by-side typography consistency (matched line-height/font weight)
+* Security hardening: dynamic shortcode/block rendering before AI requests is now opt-in and disabled by default
+* Security hardening: API key can be managed externally via `WPTOMEDIUM_API_KEY` (wp-config constant or environment variable)
+* Security hardening: ensured API key option is stored with non-autoloaded option storage
 
 = 1.2.9 =
 * Matched TinyMCE translation pane typography/spacing to the original pane (font metrics, headings, lists, paragraph rhythm)
