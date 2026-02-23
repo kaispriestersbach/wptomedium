@@ -108,6 +108,20 @@ class WPtoMedium_Workflow {
 		$original_content = apply_filters( 'the_content', $post->post_content );
 
 		// TinyMCE-Toolbar auf Medium-kompatible Tags einschränken.
+		$editor_content_style = implode(
+			'',
+			array(
+				'html,body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;font-size:16px;line-height:1.65;color:#1d2327;overflow-y:hidden;}',
+				'body{padding:16px 18px;}',
+				'p,ul,ol,blockquote,figure,pre{margin:0 0 1.2em;}',
+				'h1,h2{font-family:inherit;line-height:1.3;font-weight:700;margin:1.4em 0 .6em;}',
+				'h1{font-size:2em;}',
+				'h2{font-size:1.5em;}',
+				'img{max-width:100%;height:auto;}',
+				'figcaption{font-size:.9em;color:#50575e;}',
+			)
+		);
+
 		$editor_settings = array(
 			'textarea_name' => 'wptomedium_translation',
 			'textarea_rows' => 20,
@@ -117,13 +131,15 @@ class WPtoMedium_Workflow {
 				'toolbar1'      => 'bold,italic,link,blockquote,formatselect,bullist,numlist,code,hr,undo,redo',
 				'toolbar2'      => '',
 				'block_formats' => 'Paragraph=p;Heading 2=h2',
+				'wp_autoresize_on' => true,
+				'content_style' => $editor_content_style,
 			),
 			'quicktags'     => array(
 				'buttons' => 'strong,em,link,block,ul,ol,li,code,close',
 			),
 		);
 		?>
-		<div class="wrap">
+		<div class="wrap wptomedium-review-wrap">
 			<h1><?php esc_html_e( 'Review Translation', 'wptomedium' ); ?></h1>
 
 			<?php if ( empty( $translation ) ) : ?>

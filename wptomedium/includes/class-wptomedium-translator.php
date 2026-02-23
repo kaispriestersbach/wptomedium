@@ -105,20 +105,28 @@ class WPtoMedium_Translator {
 
 		try {
 			$client = new Client( apiKey: $api_key );
-			$model  = WPtoMedium_Settings::get_model();
+			$model  = WPtoMedium_Settings::resolve_model_for_translation( $api_key );
+			$prompt = $this->build_prompt( $post->post_title, $content );
 
-			$message = $client->messages->create(
-				model: $model,
-				maxTokens: WPtoMedium_Settings::get_max_tokens(),
-				temperature: WPtoMedium_Settings::get_temperature(),
-				system: $this->get_system_prompt(),
-				messages: array(
-					array(
-						'role'    => 'user',
-						'content' => $this->build_prompt( $post->post_title, $content ),
-					),
-				),
-			);
+			try {
+				$message = $this->create_translation_message(
+					$client,
+					$model,
+					$prompt,
+					WPtoMedium_Settings::get_max_tokens(),
+					WPtoMedium_Settings::get_temperature()
+				);
+			} catch ( \Anthropic\Core\Exceptions\BadRequestException $e ) {
+				// Retry once with known-safe defaults in case saved settings are incompatible.
+				$this->log_exception( 'Anthropic bad request, retrying with safe defaults', $e );
+				$message = $this->create_translation_message(
+					$client,
+					WPtoMedium_Settings::resolve_model_for_translation( $api_key ),
+					$prompt,
+					WPtoMedium_Settings::DEFAULT_MAX_TOKENS,
+					WPtoMedium_Settings::DEFAULT_TEMPERATURE
+				);
+			}
 
 			$response_text = '';
 			if ( isset( $message->content[0] ) && isset( $message->content[0]->text ) ) {
@@ -228,6 +236,31 @@ class WPtoMedium_Translator {
 			. '[translated HTML content]';
 
 		return $editable . $format;
+	}
+
+	/**
+	 * Send translation request to Anthropic Messages API.
+	 *
+	 * @param Client $client      Anthropic client instance.
+	 * @param string $model       Model ID.
+	 * @param string $prompt      User prompt text.
+	 * @param int    $max_tokens  Max output tokens.
+	 * @param float  $temperature Temperature value.
+	 * @return mixed Message response object from SDK.
+	 */
+	private function create_translation_message( Client $client, $model, $prompt, $max_tokens, $temperature ) {
+		return $client->messages->create(
+			model: $model,
+			maxTokens: $max_tokens,
+			temperature: $temperature,
+			system: $this->get_system_prompt(),
+			messages: array(
+				array(
+					'role'    => 'user',
+					'content' => $prompt,
+				),
+			),
+		);
 	}
 
 	/**
@@ -425,6 +458,16 @@ class WPtoMedium_Translator {
 	 */
 	private function get_api_error_message( \Throwable $exception ) {
 		if ( $exception instanceof \Anthropic\Core\Exceptions\BadRequestException ) {
+			$message = strtolower( $exception->getMessage() );
+			if (
+				false !== strpos( $message, 'credit balance is too low' )
+				|| false !== strpos( $message, 'plans & billing' )
+				|| false !== strpos( $message, 'purchase credits' )
+				|| false !== strpos( $message, 'billing' )
+			) {
+				return __( 'Insufficient Anthropic credits. Please top up your plan in Plans & Billing and try again.', 'wptomedium' );
+			}
+
 			return __( 'Invalid request. Please review your settings and try again.', 'wptomedium' );
 		}
 

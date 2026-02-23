@@ -4,7 +4,7 @@ Tags: translation, medium, ai, clipboard, multilingual
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 8.1
-Stable tag: 1.2.4
+Stable tag: 1.2.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,21 @@ Features:
 4. Go to WPtoMedium > Articles to start translating
 
 == Changelog ==
+
+= 1.2.7 =
+* Review page now opens the translation editor in Visual mode and keeps both side-by-side panels scroll-synchronized
+* Improved side-by-side readability: aligned typography/spacing between original and translation panels for long-form review
+* Added settings-page JS fallback for button actions when external admin JS is not loaded
+* Translation flow now auto-recovers from outdated saved model IDs and retries once with safe defaults on provider bad requests
+* Added specific user-facing error message for insufficient Anthropic credits (Plans & Billing)
+
+= 1.2.6 =
+* Translation requests now auto-resolve outdated/invalid saved model IDs to a valid available model
+* Added automatic one-time retry with safe defaults after provider BadRequest (settings compatibility fallback)
+
+= 1.2.5 =
+* Added settings-page inline JavaScript fallback for "Validate Key" and "Refresh Models"
+* Settings button actions now work even if external admin JS is blocked, deferred, or not loaded
 
 = 1.2.4 =
 * Fixed admin settings button actions not firing on some live sites (admin JS now reliably enqueued by page slug)

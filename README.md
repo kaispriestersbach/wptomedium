@@ -68,6 +68,21 @@ docker run --rm -v "$(pwd)/wptomedium:/app" wordpress:cli i18n make-mo /app/lang
 
 ## Changelog
 
+- **1.2.7**
+  - Review: Editor startet standardmäßig in `Visuell`, Scrollen bleibt zwischen beiden Panels synchron
+  - Review: Typografie und Abstände zwischen Original/Übersetzung wurden angeglichen, damit lange Artikel besser side-by-side lesbar sind
+  - Settings: Lokales JS-Fallback für Button-Aktionen, falls externes Admin-JS nicht lädt
+  - Translation: Veraltete Modell-IDs werden automatisch auf ein verfügbares Modell gemappt; ein BadRequest wird einmal mit sicheren Defaults erneut versucht
+  - Errors: Spezifische Meldung bei zu niedrigem Anthropic-Guthaben (Plans & Billing)
+
+- **1.2.6**
+  - Fix: Übersetzungen normalisieren veraltete Modell-IDs automatisch auf ein gültiges verfügbares Modell
+  - Fix: Bei API-BadRequest wird einmal mit sicheren Standardwerten neu versucht
+
+- **1.2.5**
+  - Fix: Settings-Seite hat jetzt ein eingebettetes JS-Fallback für "Validate Key" und "Refresh Models"
+  - Fix: Buttons funktionieren auch dann, wenn das externe Admin-JS auf Live nicht geladen oder blockiert wird
+
 - **1.2.4**
   - Fix: Settings-Buttons feuern auf manchen Live-Seiten wieder korrekt (Admin-JS wird robust nach Page-Slug geladen)
   - Fix: AJAX/XHR von der Settings-Seite wird wieder zuverlässig ausgelöst

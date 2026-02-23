@@ -440,14 +440,192 @@ class WPtoMedium_Settings {
 		?>
 		<div class="wrap">
 			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-			<form action="options.php" method="post">
-				<?php
-				settings_fields( 'wptomedium_settings' );
-				do_settings_sections( 'wptomedium-settings' );
-				submit_button();
-				?>
-			</form>
-		</div>
+				<form action="options.php" method="post">
+					<?php
+					settings_fields( 'wptomedium_settings' );
+					do_settings_sections( 'wptomedium-settings' );
+					submit_button();
+					?>
+				</form>
+			</div>
+			<?php self::render_settings_fallback_script(); ?>
+			<?php
+	}
+
+	/**
+	 * Render a settings-page-local JS fallback for button actions.
+	 *
+	 * This keeps settings actions functional even when external admin JS is blocked or not enqueued.
+	 */
+	private static function render_settings_fallback_script() {
+		$ajax_url       = admin_url( 'admin-ajax.php' );
+		$nonce          = wp_create_nonce( 'wptomedium_nonce' );
+		$request_failed = __( 'Translation request failed.', 'wptomedium' );
+		$validating     = __( 'Validating...', 'wptomedium' );
+		$refreshing     = __( 'Refreshing...', 'wptomedium' );
+		?>
+		<script>
+			( function() {
+				'use strict';
+
+				var ajaxUrl = <?php echo wp_json_encode( $ajax_url ); ?>;
+				var nonce = <?php echo wp_json_encode( $nonce ); ?>;
+				var requestFailed = <?php echo wp_json_encode( $request_failed ); ?>;
+				var validatingLabel = <?php echo wp_json_encode( $validating ); ?>;
+				var refreshingLabel = <?php echo wp_json_encode( $refreshing ); ?>;
+
+				function hideResult( element ) {
+					if ( ! element ) {
+						return;
+					}
+					element.classList.add( 'wptomedium-is-hidden' );
+					element.style.display = 'none';
+				}
+
+				function showResult( element, message, color ) {
+					if ( ! element ) {
+						return;
+					}
+					element.textContent = message;
+					element.style.color = color;
+					element.classList.remove( 'wptomedium-is-hidden' );
+					element.style.display = 'inline';
+				}
+
+				function toFormBody( action, payload ) {
+					var body = new URLSearchParams();
+					body.append( 'action', action );
+					body.append( 'nonce', nonce );
+
+					if ( payload ) {
+						Object.keys( payload ).forEach( function( key ) {
+							body.append( key, payload[ key ] );
+						} );
+					}
+
+					return body.toString();
+				}
+
+				function post( action, payload ) {
+					return fetch( ajaxUrl, {
+						method: 'POST',
+						credentials: 'same-origin',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+						},
+						body: toFormBody( action, payload ),
+					} ).then( function( response ) {
+						if ( ! response.ok ) {
+							throw new Error( 'HTTP ' + response.status );
+						}
+						return response.json();
+					} );
+				}
+
+				function responseMessage( response ) {
+					if ( ! response || 'undefined' === typeof response.data ) {
+						return requestFailed;
+					}
+					if ( 'string' === typeof response.data ) {
+						return response.data;
+					}
+					if ( response.data && response.data.message ) {
+						return response.data.message;
+					}
+					return requestFailed;
+				}
+
+				function updateModelDropdown( models ) {
+					var select = document.getElementById( 'wptomedium-model-select' );
+					if ( ! select || ! models || 'object' !== typeof models ) {
+						return;
+					}
+
+					var previous = select.value;
+					select.innerHTML = '';
+
+					Object.keys( models ).forEach( function( id ) {
+						var option = document.createElement( 'option' );
+						option.value = id;
+						option.textContent = models[ id ];
+						select.appendChild( option );
+					} );
+
+					if ( select.querySelector( 'option[value="' + previous + '"]' ) ) {
+						select.value = previous;
+					}
+				}
+
+				var validateButton = document.querySelector( '.wptomedium-validate-key' );
+				var validateResult = document.querySelector( '.wptomedium-validate-result' );
+				if ( validateButton ) {
+					var validateLabel = validateButton.textContent;
+					validateButton.addEventListener( 'click', function( event ) {
+						event.preventDefault();
+						event.stopPropagation();
+
+						var apiKeyInput = document.querySelector( 'input[name="wptomedium_api_key"]' );
+						var apiKey = apiKeyInput ? apiKeyInput.value : '';
+
+						validateButton.disabled = true;
+						validateButton.textContent = validatingLabel || validateLabel;
+						hideResult( validateResult );
+
+						post( 'wptomedium_validate_key', { api_key: apiKey } )
+							.then( function( response ) {
+								if ( response && response.success ) {
+									showResult( validateResult, responseMessage( response ), '#00a32a' );
+									if ( response.data && response.data.models ) {
+										updateModelDropdown( response.data.models );
+									}
+								} else {
+									showResult( validateResult, responseMessage( response ), '#d63638' );
+								}
+							} )
+							.catch( function() {
+								showResult( validateResult, requestFailed, '#d63638' );
+							} )
+							.then( function() {
+								validateButton.disabled = false;
+								validateButton.textContent = validateLabel;
+							} );
+					} );
+				}
+
+				var refreshButton = document.querySelector( '.wptomedium-refresh-models' );
+				var refreshResult = document.querySelector( '.wptomedium-refresh-result' );
+				if ( refreshButton ) {
+					var refreshLabel = refreshButton.textContent;
+					refreshButton.addEventListener( 'click', function( event ) {
+						event.preventDefault();
+						event.stopPropagation();
+
+						refreshButton.disabled = true;
+						refreshButton.textContent = refreshingLabel || refreshLabel;
+						hideResult( refreshResult );
+
+						post( 'wptomedium_refresh_models' )
+							.then( function( response ) {
+								if ( response && response.success ) {
+									showResult( refreshResult, responseMessage( response ), '#00a32a' );
+									if ( response.data && response.data.models ) {
+										updateModelDropdown( response.data.models );
+									}
+								} else {
+									showResult( refreshResult, responseMessage( response ), '#d63638' );
+								}
+							} )
+							.catch( function() {
+								showResult( refreshResult, requestFailed, '#d63638' );
+							} )
+							.then( function() {
+								refreshButton.disabled = false;
+								refreshButton.textContent = refreshLabel;
+							} );
+					} );
+				}
+			} )();
+		</script>
 		<?php
 	}
 
@@ -467,6 +645,39 @@ class WPtoMedium_Settings {
 	 */
 	public static function get_model() {
 		return get_option( self::OPTION_MODEL, 'claude-sonnet-4-20250514' );
+	}
+
+	/**
+	 * Resolve a valid model for translation requests.
+	 *
+	 * If the stored model is no longer available, this method falls back to the
+	 * first available model (freshly fetched when possible) and persists it.
+	 *
+	 * @param string $api_key Anthropic API key.
+	 * @return string Model ID.
+	 */
+	public static function resolve_model_for_translation( $api_key ) {
+		$current = self::get_model();
+		$models  = self::get_available_models();
+
+		if ( isset( $models[ $current ] ) ) {
+			return $current;
+		}
+
+		if ( ! empty( $api_key ) ) {
+			$fetched = self::fetch_models_from_api( $api_key );
+			if ( is_array( $fetched ) && ! empty( $fetched ) ) {
+				$models = $fetched;
+			}
+		}
+
+		if ( ! empty( $models ) ) {
+			$fallback = (string) array_key_first( $models );
+			update_option( self::OPTION_MODEL, $fallback );
+			return $fallback;
+		}
+
+		return $current;
 	}
 
 	/**
